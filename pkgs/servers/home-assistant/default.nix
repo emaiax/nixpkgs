@@ -107,16 +107,6 @@ let
         };
       });
 
-      brother = super.brother.overridePythonAttrs (rec {
-        version = "4.3.1";
-        src = fetchFromGitHub {
-          owner = "bieniu";
-          repo = "brother";
-          tag = version;
-          hash = "sha256-fWa5FNBGV8tnJ3CozMicXLGsDvnTjNzU8PdV266MeeQ=";
-        };
-      });
-
       google-genai = super.google-genai.overridePythonAttrs (old: rec {
         version = "1.7.0";
         src = fetchFromGitHub {
@@ -247,44 +237,6 @@ let
         };
       });
 
-      pyoctoprintapi = super.pyoctoprintapi.overridePythonAttrs (oldAttrs: rec {
-        version = "0.1.12";
-        src = fetchFromGitHub {
-          owner = "rfleming71";
-          repo = "pyoctoprintapi";
-          rev = "refs/tags/v${version}";
-          hash = "sha256-Jf/zYnBHVl3TYxFy9Chy6qNH/eCroZkmUOEWfd62RIo=";
-        };
-      });
-
-      # snmp component does not support pysnmp 7.0+
-      pysnmp = super.pysnmp.overridePythonAttrs (oldAttrs: rec {
-        version = "6.2.6";
-        src = fetchFromGitHub {
-          owner = "lextudio";
-          repo = "pysnmp";
-          tag = "v${version}";
-          hash = "sha256-+FfXvsfn8XzliaGUKZlzqbozoo6vDxUkgC87JOoVasY=";
-        };
-      });
-
-      pysnmpcrypto = super.pysnmpcrypto.overridePythonAttrs (oldAttrs: rec {
-        version = "0.0.4";
-        src = fetchFromGitHub {
-          owner = "lextudio";
-          repo = "pysnmpcrypto";
-          tag = "v${version}";
-          hash = "sha256-f0w4Nucpe+5VE6nhlnePRH95AnGitXeT3BZb3dhBOTk=";
-        };
-        build-system = with self; [ setuptools ];
-        postPatch = ''
-          # ValueError: invalid literal for int() with base 10: 'post0' in File "<string>", line 104, in <listcomp>
-          substituteInPlace setup.py --replace \
-            "observed_version = [int(x) for x in setuptools.__version__.split('.')]" \
-            "observed_version = [36, 2, 0]"
-        '';
-      });
-
       pysnooz = super.pysnooz.overridePythonAttrs (oldAttrs: rec {
         version = "0.8.6";
         src = fetchFromGitHub {
@@ -358,7 +310,7 @@ let
   extraBuildInputs = extraPackages python.pkgs;
 
   # Don't forget to run update-component-packages.py after updating
-  hassVersion = "2025.7.4";
+  hassVersion = "2025.8.0";
 
 in
 python.pkgs.buildPythonApplication rec {
@@ -379,13 +331,13 @@ python.pkgs.buildPythonApplication rec {
     owner = "home-assistant";
     repo = "core";
     tag = version;
-    hash = "sha256-2seMh1trP3PYnuQmWadTAiAPaI+v45+uzn9xkgUuGNE=";
+    hash = "sha256-o8NZ06GorRmICeu8GQzomkCuE2aALnodT5UuiJ4EOEc=";
   };
 
   # Secondary source is pypi sdist for translations
   sdist = fetchPypi {
     inherit pname version;
-    hash = "sha256-KwiwgQ8gAMlHLzpuYYdcLXabVrukhnfFlaODyFpuF88=";
+    hash = "sha256-U06ttXEWe46h8O2wurYyaCN78EdSCvOs10VbnyOQdsM=";
   };
 
   build-system = with python.pkgs; [
