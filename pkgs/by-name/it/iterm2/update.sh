@@ -1,5 +1,5 @@
 #!/usr/bin/env nix-shell
-#!nix-shell -i bash -p curl coreutils common-updater-scripts
+#!nix-shell -i bash -p curl coreutils gnused common-updater-scripts
 set -eu -o pipefail
 
 currentVersion=$(nix-instantiate --eval -E "with import ./. {}; iterm2.version or (lib.getVersion iterm2)" | tr -d '"')
