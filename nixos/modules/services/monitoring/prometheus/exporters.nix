@@ -122,6 +122,7 @@ let
         "smokeping"
         "snmp"
         "speedtest"
+        "speedtest-ookla"
         "sql"
         "statsd"
         "storagebox"
