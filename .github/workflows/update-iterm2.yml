@@ -77,7 +77,7 @@ jobs:
           git config user.name "emaiax"
           git config user.email "emaiax@users.noreply.github.com"
           git checkout -B update/iterm2
-          git add pkgs/by-name/it/iterm2/package.nix
+          git add pkgs/by-name/it/iterm2/package.nix .github/workflows
           git commit -m "iterm2: update to ${{ steps.version.outputs.version }}"
           git push --force "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/emaiax/nixpkgs.git" update/iterm2
 
