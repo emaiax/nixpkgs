@@ -16,7 +16,6 @@ concurrency:
 
 permissions:
   contents: write
-  workflows: write
 
 jobs:
   update:
@@ -32,7 +31,11 @@ jobs:
         run: |
           git remote add upstream https://github.com/NixOS/nixpkgs.git
           git fetch --depth 1 upstream master
+          fork_workflows=$(mktemp -d)
+          cp -R .github/workflows "$fork_workflows/"
           git reset --hard upstream/master
+          rm -rf .github/workflows
+          cp -R "$fork_workflows/workflows" .github/workflows
 
       # TODO: remove once the upstream sed fix (gnused in update.sh's
       # nix-shell -p) is merged into NixOS/nixpkgs.
