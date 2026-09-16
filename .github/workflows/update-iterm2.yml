@@ -86,7 +86,7 @@ jobs:
         env:
           GH_TOKEN: ${{ secrets.NIXPKGS_PR_TOKEN }}
         run: |
-          existing=$(gh pr list --repo NixOS/nixpkgs --head emaiax:update/iterm2 --state open --json number --jq '.[0].number')
+          existing=$(gh pr list --repo NixOS/nixpkgs --head update/iterm2 --state open --json number,headRepositoryOwner --jq '[.[] | select(.headRepositoryOwner.login == "emaiax")][0].number')
           if [ -n "$existing" ]; then
             gh pr close "$existing" --repo NixOS/nixpkgs \
               --comment "superseded by iterm2 ${{ steps.version.outputs.version }}."
