@@ -75,7 +75,7 @@ jobs:
         if: steps.diff.outputs.changed == 'true'
         run: |
           git config user.name "emaiax"
-          git config user.email "emaiax@noreply.github.com"
+          git config user.email "emaiax@users.noreply.github.com"
           git checkout -B update/iterm2
           git add pkgs/by-name/it/iterm2/package.nix
           git commit -m "iterm2: update to ${{ steps.version.outputs.version }}"
