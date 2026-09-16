@@ -1,4 +1,4 @@
-name: Update iterm2
+name: auto-update-iterm2
 
 on:
   schedule:
@@ -75,21 +75,24 @@ jobs:
         if: steps.diff.outputs.changed == 'true'
         run: |
           git config user.name "emaiax"
-          git config user.email "emaiax@fastmail.com"
+          git config user.email "emaiax@noreply.github.com"
           git checkout -B update/iterm2
           git add pkgs/by-name/it/iterm2/package.nix
           git commit -m "iterm2: update to ${{ steps.version.outputs.version }}"
           git push --force "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/emaiax/nixpkgs.git" update/iterm2
 
-      - name: Open or update the PR against NixOS/nixpkgs
+      - name: Close a stale PR and open a new one against NixOS/nixpkgs
         if: steps.diff.outputs.changed == 'true' && github.event.inputs.dry_run != 'true'
         env:
           GH_TOKEN: ${{ secrets.NIXPKGS_PR_TOKEN }}
         run: |
           existing=$(gh pr list --repo NixOS/nixpkgs --head emaiax:update/iterm2 --state open --json number --jq '.[0].number')
-          if [ -z "$existing" ]; then
-            cat > pr-body.md <<EOF
-          Automated bump via GitHub Actions running on a macos-latest (aarch64-darwin) runner — a workaround for nix-community/nixpkgs-update#513: the shared nixpkgs-update bot runs on Linux workers and can't evaluate/build darwin-only packages like \`iterm2\`.
+          if [ -n "$existing" ]; then
+            gh pr close "$existing" --repo NixOS/nixpkgs \
+              --comment "superseded by iterm2 ${{ steps.version.outputs.version }}."
+          fi
+          cat > pr-body.md <<EOF
+          Automated bump via GitHub Actions running on a macos-latest (aarch64-darwin) runner: a workaround for nix-community/nixpkgs-update#513: the shared nixpkgs-update bot runs on Linux workers and can't evaluate/build darwin-only packages like \`iterm2\`.
 
           ## Things done
 
@@ -121,12 +124,9 @@ jobs:
           [nixos/tests]: https://github.com/NixOS/nixpkgs/blob/master/nixos/tests
           [pkgs/README.md]: https://github.com/NixOS/nixpkgs/blob/master/pkgs/README.md
           EOF
-            gh pr create \
-              --repo NixOS/nixpkgs \
-              --head emaiax:update/iterm2 \
-              --base master \
-              --title "iterm2: update to ${{ steps.version.outputs.version }}" \
-              --body-file pr-body.md
-          else
-            echo "PR #$existing already exists; push updated the update/iterm2 branch."
-          fi
+          gh pr create \
+            --repo NixOS/nixpkgs \
+            --head emaiax:update/iterm2 \
+            --base master \
+            --title "iterm2: update to ${{ steps.version.outputs.version }}" \
+            --body-file pr-body.md
