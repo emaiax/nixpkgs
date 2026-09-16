@@ -31,11 +31,7 @@ jobs:
         run: |
           git remote add upstream https://github.com/NixOS/nixpkgs.git
           git fetch --depth 1 upstream master
-          fork_workflows=$(mktemp -d)
-          cp -R .github/workflows "$fork_workflows/"
           git reset --hard upstream/master
-          rm -rf .github/workflows
-          cp -R "$fork_workflows/workflows" .github/workflows
 
       # TODO: remove once the upstream sed fix (gnused in update.sh's
       # nix-shell -p) is merged into NixOS/nixpkgs.
@@ -73,13 +69,15 @@ jobs:
 
       - name: Commit and push the update/iterm2 branch
         if: steps.diff.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.NIXPKGS_PR_TOKEN }}
         run: |
           git config user.name "emaiax"
           git config user.email "emaiax@users.noreply.github.com"
           git checkout -B update/iterm2
-          git add pkgs/by-name/it/iterm2/package.nix .github/workflows
+          git add pkgs/by-name/it/iterm2/package.nix
           git commit -m "iterm2: update to ${{ steps.version.outputs.version }}"
-          git push --force "https://x-access-token:${{ secrets.GITHUB_TOKEN }}@github.com/emaiax/nixpkgs.git" update/iterm2
+          git push --force "https://x-access-token:${GH_TOKEN}@github.com/emaiax/nixpkgs.git" update/iterm2
 
       - name: Close a stale PR and open a new one against NixOS/nixpkgs
         if: steps.diff.outputs.changed == 'true' && github.event.inputs.dry_run != 'true'
