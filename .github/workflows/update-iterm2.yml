@@ -70,7 +70,7 @@ jobs:
       - name: Commit and push the update/iterm2 branch
         if: steps.diff.outputs.changed == 'true'
         env:
-          GH_TOKEN: ${{ secrets.NIXPKGS_PR_TOKEN }}
+          GH_TOKEN: ${{ secrets.NIXPKGS_AUTO_UPDATE_TOKEN }}
         run: |
           git config user.name "emaiax"
           git config user.email "emaiax@users.noreply.github.com"
@@ -82,7 +82,7 @@ jobs:
       - name: Close a stale PR and open a new one against NixOS/nixpkgs
         if: steps.diff.outputs.changed == 'true' && github.event.inputs.dry_run != 'true'
         env:
-          GH_TOKEN: ${{ secrets.NIXPKGS_PR_TOKEN }}
+          GH_TOKEN: ${{ secrets.NIXPKGS_AUTO_UPDATE_TOKEN }}
         run: |
           existing=$(gh pr list --repo NixOS/nixpkgs --head update/iterm2 --state open --json number,headRepositoryOwner --jq '[.[] | select(.headRepositoryOwner.login == "emaiax")][0].number')
           if [ -n "$existing" ]; then
