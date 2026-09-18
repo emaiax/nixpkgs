@@ -26,6 +26,7 @@ jobs:
         with:
           ref: master
           fetch-depth: 1 # content is fully replaced by the reset below
+          persist-credentials: false # otherwise this shadows GH_TOKEN below and every push authenticates as github-actions[bot]
 
       - name: Sync local checkout with upstream nixpkgs
         run: |
