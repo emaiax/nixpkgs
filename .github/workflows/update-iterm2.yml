@@ -74,11 +74,17 @@ jobs:
         if: steps.diff.outputs.changed == 'true'
         env:
           GH_TOKEN: ${{ secrets.NIXPKGS_AUTO_UPDATE_TOKEN }}
+          # persist-credentials: false above strips origin's stored auth, so an
+          # unrelated network hiccup can make git fall back to asking for
+          # credentials; on macos-latest that means the osxkeychain credential
+          # helper, which blocks on a GUI prompt nobody's there to answer and
+          # hangs the job for hours instead of failing. Force a fast failure.
+          GIT_TERMINAL_PROMPT: "0"
         run: |
           echo "up_to_date=false" >> "$GITHUB_OUTPUT"
-          if git fetch origin update/iterm2 && git cat-file -e origin/update/iterm2 2>/dev/null; then
+          if git -c credential.helper= fetch --depth=1 origin update/iterm2; then
             open_pr=$(gh pr list --repo NixOS/nixpkgs --head update/iterm2 --state open --json number,headRepositoryOwner --jq '[.[] | select(.headRepositoryOwner.login == "emaiax")][0].number')
-            existing_version=$(git show origin/update/iterm2:pkgs/by-name/it/iterm2/package.nix | sed -n 's/.*version = "\([^"]*\)".*/\1/p' | head -1)
+            existing_version=$(git show FETCH_HEAD:pkgs/by-name/it/iterm2/package.nix | sed -n 's/.*version = "\([^"]*\)".*/\1/p' | head -1)
             if [ -n "$open_pr" ] && [ "$existing_version" = "${{ steps.version.outputs.version }}" ]; then
               echo "PR #$open_pr already proposes iterm2 ${{ steps.version.outputs.version }}; nothing new to open."
               echo "up_to_date=true" >> "$GITHUB_OUTPUT"
