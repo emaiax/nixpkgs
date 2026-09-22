@@ -80,8 +80,29 @@ jobs:
           git commit -m "iterm2: update to ${{ steps.version.outputs.version }}"
           git push --force "https://x-access-token:${GH_TOKEN}@github.com/emaiax/nixpkgs.git" update/iterm2
 
+      # Upstream nixpkgs#master won't have a same-day-merge, so update.sh keeps
+      # rediffing against the pre-bump version and steps.diff always reports
+      # changed=true even when yesterday's PR is still open and unreviewed.
+      # This compares the freshly made commit against that PR's head commit
+      # (both deterministic given identical inputs) to tell "new release" apart
+      # from "still waiting on the same one", instead of closing and reopening
+      # an identical PR every day.
+      - name: Check if this exact update is already proposed upstream
+        id: existing
+        if: steps.diff.outputs.changed == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.NIXPKGS_AUTO_UPDATE_TOKEN }}
+        run: |
+          existing_sha=$(gh pr list --repo NixOS/nixpkgs --head update/iterm2 --state open --json headRepositoryOwner,headRefOid --jq '[.[] | select(.headRepositoryOwner.login == "emaiax")][0].headRefOid')
+          if [ -n "$existing_sha" ] && [ "$existing_sha" = "$(git rev-parse HEAD)" ]; then
+            echo "A PR already proposes this exact commit ($existing_sha); nothing new to open."
+            echo "up_to_date=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "up_to_date=false" >> "$GITHUB_OUTPUT"
+          fi
+
       - name: Close a stale PR and open a new one against NixOS/nixpkgs
-        if: steps.diff.outputs.changed == 'true' && github.event.inputs.dry_run != 'true'
+        if: steps.diff.outputs.changed == 'true' && steps.existing.outputs.up_to_date != 'true' && github.event.inputs.dry_run != 'true'
         env:
           GH_TOKEN: ${{ secrets.NIXPKGS_AUTO_UPDATE_TOKEN }}
         run: |
