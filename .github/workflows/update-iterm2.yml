@@ -159,9 +159,8 @@ jobs:
       - name: Write the PR body
         run: |
           cat > pr-body.md <<EOF
+          Update iterm2 package to ${{ needs.prepare.outputs.new_version }}.
           Changelog: https://iterm2.com/downloads.html
-
-          > automated bump via GitHub Actions running on a macos-latest (aarch64-darwin) runner: a workaround for nix-community/nixpkgs-update#513: the shared nixpkgs-update bot runs on Linux workers and can't evaluate/build darwin-only packages like \`iterm2\`.
 
           ## Things done
 
@@ -193,6 +192,8 @@ jobs:
           [nixos/tests]: https://github.com/NixOS/nixpkgs/blob/master/nixos/tests
           [pkgs/README.md]: https://github.com/NixOS/nixpkgs/blob/master/pkgs/README.md
           [pkgs/test]: https://github.com/NixOS/nixpkgs/blob/master/pkgs/test
+
+          > automated bump via GitHub Actions running on a macos-latest (aarch64-darwin) runner: a workaround for nix-community/nixpkgs-update#513: the shared nixpkgs-update bot runs on Linux workers and can't evaluate/build darwin-only packages like \`iterm2\`
           EOF
 
       - name: Open or update the PR against the target repo
