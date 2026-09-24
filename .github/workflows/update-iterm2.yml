@@ -148,3 +148,64 @@ jobs:
 
       - name: Build iterm2
         run: nix-build -A iterm2 --no-out-link
+
+  propose-pr:
+    runs-on: ubuntu-latest
+    needs: [prepare, build]
+    if: needs.prepare.outputs.changed == 'true' && needs.prepare.outputs.up_to_date != 'true' && github.event.inputs.dry_run != 'true'
+    env:
+      GH_TOKEN: ${{ secrets.NIXPKGS_AUTO_UPDATE_TOKEN }}
+    steps:
+      - name: Write the PR body
+        run: |
+          cat > pr-body.md <<EOF
+          Changelog: https://iterm2.com/downloads.html
+
+          > automated bump via GitHub Actions running on a macos-latest (aarch64-darwin) runner: a workaround for nix-community/nixpkgs-update#513: the shared nixpkgs-update bot runs on Linux workers and can't evaluate/build darwin-only packages like \`iterm2\`.
+
+          ## Things done
+
+          - Built on platform:
+            - [ ] x86_64-linux
+            - [ ] aarch64-linux
+            - [x] aarch64-darwin
+          - Tested, as applicable:
+            - [ ] [NixOS tests] in [nixos/tests].
+            - [ ] [Package tests] at \`passthru.tests\`.
+            - [ ] Tests in [lib/tests] or [pkgs/test] for functions and "core" functionality.
+          - [ ] Ran \`nixpkgs-review\` on this PR. See [nixpkgs-review usage].
+          - [ ] Tested basic functionality of all binary files, usually in \`./result/bin/\`.
+          - Nixpkgs Release Notes
+            - [ ] Package update: when the change is major or breaking.
+          - NixOS Release Notes
+            - [ ] Module addition: when adding a new NixOS module.
+            - [ ] Module update: when the change is significant.
+          - [x] Fits [CONTRIBUTING.md], [pkgs/README.md], [maintainers/README.md] and other READMEs.
+          - [x] Follows the [automation/AI policy] — exempt as maintainer-approved automation running an existing update script, no LLM involved in this run's output.
+
+          [NixOS tests]: https://nixos.org/manual/nixos/unstable/index.html#sec-nixos-tests
+          [Package tests]: https://github.com/NixOS/nixpkgs/blob/master/pkgs/README.md#package-tests
+          [nixpkgs-review usage]: https://github.com/Mic92/nixpkgs-review#usage
+          [CONTRIBUTING.md]: https://github.com/NixOS/nixpkgs/blob/master/CONTRIBUTING.md
+          [automation/AI policy]: https://github.com/NixOS/nixpkgs/blob/master/CONTRIBUTING.md#automationai-policy
+          [maintainers/README.md]: https://github.com/NixOS/nixpkgs/blob/master/maintainers/README.md
+          [lib/tests]: https://github.com/NixOS/nixpkgs/blob/master/lib/tests
+          [nixos/tests]: https://github.com/NixOS/nixpkgs/blob/master/nixos/tests
+          [pkgs/README.md]: https://github.com/NixOS/nixpkgs/blob/master/pkgs/README.md
+          [pkgs/test]: https://github.com/NixOS/nixpkgs/blob/master/pkgs/test
+          EOF
+
+      - name: Open or update the PR against the target repo
+        run: |
+          title="iterm2: ${{ needs.prepare.outputs.old_version }} -> ${{ needs.prepare.outputs.new_version }}"
+          existing=$(gh pr list --repo ${{ needs.prepare.outputs.repo }} --head update/iterm2 --state open --json number,headRepositoryOwner --jq '[.[] | select(.headRepositoryOwner.login == "emaiax")][0].number')
+          if [ -n "$existing" ]; then
+            gh pr edit "$existing" --repo ${{ needs.prepare.outputs.repo }} --title "$title" --body-file pr-body.md
+          else
+            gh pr create \
+              --repo ${{ needs.prepare.outputs.repo }} \
+              --head emaiax:update/iterm2 \
+              --base ${{ needs.prepare.outputs.base }} \
+              --title "$title" \
+              --body-file pr-body.md
+          fi
