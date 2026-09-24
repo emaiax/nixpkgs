@@ -40,8 +40,13 @@ jobs:
         run: |
           if [ "${{ github.event.inputs.target }}" = "upstream" ]; then
             echo "repo=NixOS/nixpkgs" >> "$GITHUB_OUTPUT"
+            echo "base=master" >> "$GITHUB_OUTPUT"
           else
             echo "repo=emaiax/nixpkgs" >> "$GITHUB_OUTPUT"
+            # emaiax/nixpkgs's master isn't kept in sync with upstream, so diffing
+            # against it would show that entire divergence instead of just the
+            # version bump. update/iterm2-base is pinned to the pre-bump commit.
+            echo "base=update/iterm2-base" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Sync local checkout with upstream nixpkgs
@@ -125,11 +130,17 @@ jobs:
           git config user.name "emaiax"
           git config user.email "emaiax@users.noreply.github.com"
           git checkout -B update/iterm2
+          base_sha=$(git rev-parse HEAD)
           git add pkgs/by-name/it/iterm2/package.nix
           git commit -m "iterm2: ${{ steps.old_version.outputs.version }} -> ${{ steps.version.outputs.version }}
 
           https://iterm2.com/downloads"
-          git push --force "https://x-access-token:${GH_TOKEN}@github.com/emaiax/nixpkgs.git" update/iterm2
+          # emaiax/nixpkgs's own master is never kept in sync with upstream, so a
+          # target=origin PR needs its own base ref pinned to the pre-bump commit;
+          # otherwise the diff is the entire divergence between the two masters,
+          # not just the version bump (see PR emaiax/nixpkgs#1).
+          git push --force "https://x-access-token:${GH_TOKEN}@github.com/emaiax/nixpkgs.git" \
+            "${base_sha}:refs/heads/update/iterm2-base" update/iterm2
 
       - name: Close a stale PR and open a new one against the target repo
         if: steps.diff.outputs.changed == 'true' && steps.existing.outputs.up_to_date != 'true' && github.event.inputs.dry_run != 'true'
@@ -177,6 +188,6 @@ jobs:
           gh pr create \
             --repo ${{ steps.target.outputs.repo }} \
             --head emaiax:update/iterm2 \
-            --base master \
+            --base ${{ steps.target.outputs.base }} \
             --title "iterm2: update to ${{ steps.version.outputs.version }}" \
             --body-file pr-body.md
