@@ -139,7 +139,7 @@ jobs:
           git add pkgs/by-name/it/iterm2/package.nix
           git commit -m "iterm2: ${{ steps.old_version.outputs.version }} -> ${{ steps.version.outputs.version }}
 
-          https://iterm2.com/downloads"
+          https://iterm2.com/downloads.html"
           # emaiax/nixpkgs's own master is never kept in sync with upstream, so a
           # target=origin PR needs its own base ref pinned to the pre-bump commit;
           # otherwise the diff is the entire divergence between the two masters,
@@ -158,6 +158,8 @@ jobs:
               --comment "superseded by iterm2 ${{ steps.version.outputs.version }}."
           fi
           cat > pr-body.md <<EOF
+          Changelog: https://iterm2.com/downloads.html
+
           Automated bump via GitHub Actions running on a macos-latest (aarch64-darwin) runner: a workaround for nix-community/nixpkgs-update#513: the shared nixpkgs-update bot runs on Linux workers and can't evaluate/build darwin-only packages like \`iterm2\`.
 
           ## Things done
@@ -194,5 +196,5 @@ jobs:
             --repo ${{ steps.target.outputs.repo }} \
             --head emaiax:update/iterm2 \
             --base ${{ steps.target.outputs.base }} \
-            --title "iterm2: update to ${{ steps.version.outputs.version }}" \
+            --title "iterm2: ${{ steps.old_version.outputs.version }} -> ${{ steps.version.outputs.version }}" \
             --body-file pr-body.md
