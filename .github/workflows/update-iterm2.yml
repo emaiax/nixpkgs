@@ -2,7 +2,7 @@ name: auto-update-iterm2
 
 on:
   schedule:
-    - cron: "0 10 * * *" # daily, 10:00 UTC
+    - cron: "0 10 * * 1" # weekly, Mondays 10:00 UTC
   workflow_dispatch:
     inputs:
       dry_run:
