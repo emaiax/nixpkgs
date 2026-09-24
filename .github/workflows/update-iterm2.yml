@@ -48,11 +48,8 @@ jobs:
             echo "base=master" >> "$GITHUB_OUTPUT"
           else
             echo "repo=emaiax/nixpkgs" >> "$GITHUB_OUTPUT"
-            # master is synced with upstream by the step above, but GitHub's API can
-            # lag a few seconds behind that push; diffing against a not-yet-updated
-            # master would show the same runaway divergence that produced
-            # emaiax/nixpkgs#1. update/iterm2-base is pinned to the pre-bump commit
-            # instead, so the PR diff is correct regardless of sync propagation.
+            # GitHub's sync above can lag a few seconds; a stale master would repeat
+            # emaiax/nixpkgs#1's blowup. update/iterm2-base pins the pre-bump commit instead.
             echo "base=update/iterm2-base" >> "$GITHUB_OUTPUT"
           fi
 
@@ -62,8 +59,7 @@ jobs:
           git fetch --depth 1 upstream master
           git reset --hard upstream/master
 
-      # TODO: remove once the upstream sed fix (gnused in update.sh's
-      # nix-shell -p) is merged into NixOS/nixpkgs.
+      # TODO: drop once update.sh's nix-shell -p gnused fix lands upstream.
       - name: Apply temporary gnused patch (pending upstream PR)
         run: |
           sed -i '' \
@@ -98,21 +94,15 @@ jobs:
           version=$(nix-instantiate --eval -E "with import ./. {}; iterm2.version" | tr -d '"')
           echo "version=$version" >> "$GITHUB_OUTPUT"
 
-      # Must run before the branch is touched: querying gh pr list for the
-      # PR's head SHA right after our own force-push raced GitHub's API,
-      # which hadn't caught up to the push yet, so the comparison always
-      # missed and a duplicate PR opened daily. Reading the pre-push remote
-      # branch's version instead has no such race.
+      # Runs before the branch changes: querying right after our own force-push can
+      # race GitHub's API. Reading the pre-push remote branch's version avoids that.
       - name: Check if this version is already proposed on the target repo
         id: existing
         if: steps.diff.outputs.changed == 'true'
         env:
           GH_TOKEN: ${{ secrets.NIXPKGS_AUTO_UPDATE_TOKEN }}
-          # persist-credentials: false above strips origin's stored auth, so an
-          # unrelated network hiccup can make git fall back to asking for
-          # credentials; on macos-latest that means the osxkeychain credential
-          # helper, which blocks on a GUI prompt nobody's there to answer and
-          # hangs the job for hours instead of failing. Force a fast failure.
+          # persist-credentials: false strips origin's auth, so a network hiccup can fall
+          # back to a credential prompt; on macos-latest that hangs for hours. Fail fast instead.
           GIT_TERMINAL_PROMPT: "0"
         run: |
           echo "up_to_date=false" >> "$GITHUB_OUTPUT"
@@ -142,10 +132,8 @@ jobs:
           git commit -m "iterm2: ${{ steps.old_version.outputs.version }} -> ${{ steps.version.outputs.version }}
 
           https://iterm2.com/downloads.html"
-          # emaiax/nixpkgs's own master is never kept in sync with upstream, so a
-          # target=origin PR needs its own base ref pinned to the pre-bump commit;
-          # otherwise the diff is the entire divergence between the two masters,
-          # not just the version bump (see PR emaiax/nixpkgs#1).
+          # update/iterm2-base pins the pre-bump commit, so a target=origin PR's diff stays
+          # correct even if the master sync above hasn't propagated yet (see emaiax/nixpkgs#1).
           git push --force "https://x-access-token:${GH_TOKEN}@github.com/emaiax/nixpkgs.git" \
             "${base_sha}:refs/heads/update/iterm2-base" update/iterm2
 
