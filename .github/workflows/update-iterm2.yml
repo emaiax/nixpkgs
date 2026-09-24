@@ -28,6 +28,11 @@ jobs:
   update:
     runs-on: macos-latest
     steps:
+      - name: Sync fork's master with upstream
+        env:
+          GH_TOKEN: ${{ secrets.NIXPKGS_AUTO_UPDATE_TOKEN }}
+        run: gh repo sync emaiax/nixpkgs --branch master
+
       - name: Checkout fork
         uses: actions/checkout@v4
         with:
