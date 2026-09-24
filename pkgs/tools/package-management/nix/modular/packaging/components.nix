@@ -125,8 +125,6 @@ let
             !(stdenv.hostPlatform.isWindows || stdenv.hostPlatform.isCygwin)
             # build failure
             && !stdenv.hostPlatform.isStatic
-            # LTO breaks exception handling on x86-64-darwin.
-            && stdenv.system != "x86_64-darwin"
           )
           ''
             case "$mesonBuildType" in
@@ -174,6 +172,17 @@ let
         export CXXFLAGS="''${CXXFLAGS:-} ${toString interpositionFlags}"
       '';
     outputs = prevAttrs.outputs or [ "out" ] ++ [ "dev" ];
+  };
+
+  fixupStaticLayer = finalAttrs: prevAttrs: {
+    postFixup =
+      prevAttrs.postFixup or ""
+      + lib.optionalString (stdenv.hostPlatform.isStatic) ''
+        # HACK: Otherwise the result will have the entire buildInputs closure
+        # injected by the pkgsStatic stdenv
+        # <https://github.com/NixOS/nixpkgs/issues/83667>
+        rm -f $out/nix-support/propagated-build-inputs
+      '';
   };
 
   # Work around weird `--as-needed` linker behavior with BSD, see
@@ -325,6 +334,7 @@ in
     scope.sourceLayer
     setVersionLayer
     mesonLayer
+    fixupStaticLayer
     scope.mesonComponentOverrides
   ];
   mkMesonExecutable = mkPackageBuilder [
@@ -334,6 +344,7 @@ in
     setVersionLayer
     mesonLayer
     mesonBuildLayer
+    fixupStaticLayer
     scope.mesonComponentOverrides
   ];
   mkMesonLibrary = mkPackageBuilder [
@@ -344,8 +355,16 @@ in
     setVersionLayer
     mesonBuildLayer
     mesonLibraryLayer
+    fixupStaticLayer
     scope.mesonComponentOverrides
   ];
+
+  /**
+    Whether to embed the public C API into nix-cli so plugins can resolve those symbols from the executable.
+  */
+  withPluginCAPI =
+    (lib.versionAtLeast (lib.versions.majorMinor version) "2.35")
+    && !(stdenv.hostPlatform.isWindows || stdenv.hostPlatform.isStatic);
 
   nix-util = callPackage ../src/libutil/package.nix { };
   nix-util-c = callPackage ../src/libutil-c/package.nix { };

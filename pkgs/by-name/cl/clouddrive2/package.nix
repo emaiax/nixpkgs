@@ -11,16 +11,15 @@ let
 in
 stdenv.mkDerivation (finalAttrs: {
   pname = "clouddrive2";
-  version = "1.0.11";
+  version = "1.0.17";
 
   src = fetchurl {
     url = "https://github.com/cloud-fs/cloud-fs.github.io/releases/download/v${finalAttrs.version}/clouddrive-2-${os}-${arch}-${finalAttrs.version}.tgz";
     hash =
       {
-        x86_64-linux = "sha256-X5WAnHyXdAkWrN/AbkDE0eNH4mwdPcZ0Cs5Q21KB6/w=";
-        aarch64-linux = "sha256-somHyDBG94pGQB+IZd404H1tX0X2qC8LeIcXeihU6yA=";
-        x86_64-darwin = "sha256-O28IQTelQSZj9P4ETYaeQfxvN5Etxed4ZwvfJB4vBM8=";
-        aarch64-darwin = "sha256-GaL2bCwQdtI3bq2wkwza1OEHFvhppdZpUIq3QRQ0vN8=";
+        x86_64-linux = "sha256-WnvY7c++9ZWDYpSssX1P0jKJDiSMrLCkongkWMlwSfU=";
+        aarch64-linux = "sha256-GBzr4HXbClTqTgMhVzW3jljrMYWqjM/Uj8TLXZ6aUes=";
+        aarch64-darwin = "sha256-/U+DczEKskbYawjIh1s0sGX3Sja4XksYlQgYKvT20AY=";
       }
       .${stdenv.hostPlatform.system} or (throw "unsupported system ${stdenv.hostPlatform.system}");
   };
@@ -58,7 +57,6 @@ stdenv.mkDerivation (finalAttrs: {
     platforms = [
       "x86_64-linux"
       "aarch64-linux"
-      "x86_64-darwin"
       "aarch64-darwin"
     ];
     sourceProvenance = with lib.sourceTypes; [ binaryNativeCode ];

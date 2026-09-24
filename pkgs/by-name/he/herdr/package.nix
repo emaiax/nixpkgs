@@ -3,7 +3,9 @@
   stdenv,
   rustPlatform,
   fetchFromGitHub,
-  zig_0_15,
+  zig_0_16,
+  installAgentSkills,
+  installShellFiles,
   cctools,
   xcbuild,
   versionCheckHook,
@@ -11,28 +13,30 @@
 }:
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "herdr";
-  version = "0.7.3";
+  version = "0.9.1";
 
   __structuredAttrs = true;
 
   src = fetchFromGitHub {
-    owner = "ogulcancelik";
+    owner = "herdrdev";
     repo = "herdr";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-Q2yvMs/N6oAF8xnRIrMxEOOV6Aj8aAXQzuvcaux2enA=";
+    hash = "sha256-N6+kprfWRyh0AkAiopkGsNXUGGORyPVFHEaDHCpGQs8=";
   };
 
-  cargoHash = "sha256-DRjcIJXWGxiA9c7xIiQoWU9az2EFjXsnFKu5sC933eE=";
+  cargoHash = "sha256-1VAmsDE3zeU0wMVQKleQcd/zq8/k/oor8tasrsRQfeY=";
 
-  zigDeps = zig_0_15.fetchDeps {
+  zigDeps = zig_0_16.fetchDeps {
     inherit (finalAttrs) pname version;
     src = "${finalAttrs.src}/vendor/libghostty-vt";
     fetchAll = true;
-    hash = "sha256-pgGu8+NwvFcj6SrN4VaTHLeHdA7QY731ctyrHZwgFAc=";
+    hash = "sha256-Cy0DdSvce+fhOFIfxHMQGF2b2j16UkS27UpGbfC42XI=";
   };
 
   nativeBuildInputs = [
-    zig_0_15.hook
+    zig_0_16
+    installAgentSkills
+    installShellFiles
   ]
   ++ lib.optionals stdenv.hostPlatform.isDarwin [
     cctools
@@ -53,6 +57,13 @@ rustPlatform.buildRustPackage (finalAttrs: {
     chmod -R u+w "$ZIG_GLOBAL_CACHE_DIR/p"
   '';
 
+  postInstall = lib.optionalString (stdenv.buildPlatform.canExecute stdenv.hostPlatform) ''
+    installShellCompletion --cmd herdr \
+      --bash <("$out/bin/herdr" completion bash) \
+      --fish <("$out/bin/herdr" completion fish) \
+      --zsh <("$out/bin/herdr" completion zsh)
+  '';
+
   nativeInstallCheckInputs = [ versionCheckHook ];
   doInstallCheck = true;
 
@@ -66,9 +77,13 @@ rustPlatform.buildRustPackage (finalAttrs: {
   meta = {
     description = "Agent multiplexer that lives in your terminal";
     homepage = "https://herdr.dev";
-    changelog = "https://github.com/ogulcancelik/herdr/releases/tag/v${finalAttrs.version}";
-    license = lib.licenses.agpl3Plus;
-    maintainers = with lib.maintainers; [ kevinpita ];
+    changelog = "https://github.com/herdrdev/herdr/releases/tag/v${finalAttrs.version}";
+    license = lib.licenses.asl20;
+    maintainers = with lib.maintainers; [
+      agilesteel
+      faukah
+      kevinpita
+    ];
     mainProgram = "herdr";
     platforms = lib.platforms.unix;
   };

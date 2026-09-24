@@ -7,6 +7,7 @@
   cmake,
   just,
   cosmic-randr,
+  dav1d,
   libinput,
   linux-pam,
   udev,
@@ -15,18 +16,22 @@
   nix-update-script,
   nixosTests,
   orca,
+  withLogind ? true,
+  withSystemd ? true,
+  withUpower ? true,
+  withNetworkManager ? true,
 }:
 
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "cosmic-greeter";
-  version = "1.2.0";
+  version = "1.8.0";
 
   # nixpkgs-update: no auto update
   src = fetchFromGitHub {
     owner = "pop-os";
     repo = "cosmic-greeter";
     tag = "epoch-${finalAttrs.version}";
-    hash = "sha256-JaPF2kFXQLumPBn8JFBiaSJ/tP3QqK/hwhy5rZrLuY4=";
+    hash = "sha256-mC8m6hbQ6VgJoFl7VFRkbKl4zev8pffKHRtzvXtwoRo=";
   };
 
   postPatch = ''
@@ -34,9 +39,17 @@ rustPlatform.buildRustPackage (finalAttrs: {
     substituteInPlace src/greeter.rs --replace-fail '/usr/bin/orca' '${lib.getExe orca}'
   '';
 
-  cargoHash = "sha256-mfY2hsMxBooRjmTB2jgUIKyKHBpGfZ9Qslwv+2aEQyg=";
+  cargoHash = "sha256-vHR9go8/iVUT7oBV8h+mmBvhi2oSKNBKtV0uoDOr6go=";
 
-  cargoBuildFlags = [ "--all" ];
+  buildNoDefaultFeatures = true;
+
+  cargoBuildFlags = [ "--workspace" ];
+
+  buildFeatures =
+    lib.optionals withLogind [ "logind" ]
+    ++ lib.optionals withSystemd [ "systemd" ]
+    ++ lib.optionals withUpower [ "upower" ]
+    ++ lib.optionals withNetworkManager [ "networkmanager" ];
 
   separateDebugInfo = true;
   __structuredAttrs = true;
@@ -52,6 +65,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
 
   buildInputs = [
     cosmic-randr
+    dav1d
     libinput
     linux-pam
     udev

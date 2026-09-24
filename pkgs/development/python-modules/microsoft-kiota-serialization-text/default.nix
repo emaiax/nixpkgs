@@ -13,14 +13,14 @@
 
 buildPythonPackage rec {
   pname = "microsoft-kiota-serialization-text";
-  version = "1.11.7";
+  version = "1.14.0";
   pyproject = true;
 
   src = fetchFromGitHub {
     owner = "microsoft";
     repo = "kiota-python";
     tag = "microsoft-kiota-serialization-text-v${version}";
-    hash = "sha256-Fd9XSO3H1Au8y+Acft5to7hi7QNwWcmP0/NeWZlufjg=";
+    hash = "sha256-vA1kD+ye+IOYwDKRYAr/Y+M9sLOdXbzTx6lijaqpq4M=";
   };
 
   sourceRoot = "${src.name}/packages/serialization/text/";

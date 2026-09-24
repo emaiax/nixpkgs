@@ -5,25 +5,28 @@
   rustPlatform,
   perl,
   pkg-config,
-  testers,
   dbus,
   udev,
+  cacert,
+  versionCheckHook,
   nix-update-script,
 }:
 
 rustPlatform.buildRustPackage (finalAttrs: {
-  __structuredAttrs = true;
   pname = "fnox";
-  version = "1.29.0";
+  version = "1.34.1";
+
+  __structuredAttrs = true;
+  __darwinAllowLocalNetworking = true;
 
   src = fetchFromGitHub {
     owner = "jdx";
     repo = "fnox";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-sXFcvpAcHrzRbqYLIrq844TH1dHY1G23QIQoIcsCLGY=";
+    hash = "sha256-OZ9WVPsx6McCk6ONuUZ8Ws7f5WHlEMUOEYV457jexAs=";
   };
 
-  cargoHash = "sha256-BhBWghjPC8qs5oKECmddV250YO4/hSWupOz+J9DYKog=";
+  cargoHash = "sha256-QRRIZOjqYdVsK04vjyLRhbI1jsV2oekfORswbDYQBIg=";
 
   nativeBuildInputs = [
     perl
@@ -35,10 +38,13 @@ rustPlatform.buildRustPackage (finalAttrs: {
     udev
   ];
 
-  passthru = {
-    tests.version = testers.testVersion { package = finalAttrs.finalPackage; };
-    updateScript = nix-update-script { };
-  };
+  nativeCheckInputs = [ cacert ];
+  env.SSL_CERT_FILE = "${cacert}/etc/ssl/certs/ca-bundle.crt";
+
+  nativeInstallCheckInputs = [ versionCheckHook ];
+  doInstallCheck = true;
+
+  passthru.updateScript = nix-update-script { };
 
   checkFlags = [
     # requires a D-Bus session unavailable in the sandbox

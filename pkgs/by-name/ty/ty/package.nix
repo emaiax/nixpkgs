@@ -17,7 +17,7 @@
 
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "ty";
-  version = "0.0.56";
+  version = "0.0.82";
   __structuredAttrs = true;
 
   src = fetchFromGitHub {
@@ -25,7 +25,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
     repo = "ty";
     tag = finalAttrs.version;
     fetchSubmodules = true;
-    hash = "sha256-H5Tin3+OFSmlC2b86gPISE0ZK6+vR+ijYtJBzeyBgL4=";
+    hash = "sha256-7zYLPTkVXbHBluqjzUMzc0fTfpVKFRa92mNA9wR7WL0=";
   };
 
   # For Darwin platforms, remove the integration test for file notifications,
@@ -39,7 +39,7 @@ rustPlatform.buildRustPackage (finalAttrs: {
 
   cargoBuildFlags = [ "--package=ty" ];
 
-  cargoHash = "sha256-suXPAZAQ4dddcHBwmdrpC4cUEs7CgTmW9Bn/v9Roe0U=";
+  cargoHash = "sha256-2I6FhTHZhEAMruPv3gOfZTgO9TYdo3/u+zzeAM1Gq4o=";
 
   nativeBuildInputs = [ installShellFiles ];
   buildInputs = [ rust-jemalloc-sys ];
@@ -72,6 +72,10 @@ rustPlatform.buildRustPackage (finalAttrs: {
 
     # flaky: unmatched assertion: revealed: Literal[1]
     "--skip=mdtest::generics/pep695/functions.md"
+
+    # flaky: https://github.com/astral-sh/ty/issues/1540
+    # fails with: Indexed project files contains '/build/.tmpOzGFH2/project/bar/baz.py' which was not expected.
+    "--skip=unix::symlink_inside_project"
   ];
 
   nativeInstallCheckInputs = [ versionCheckHook ];
@@ -92,6 +96,8 @@ rustPlatform.buildRustPackage (finalAttrs: {
   passthru = {
     updateScript = nix-update-script { };
   };
+
+  requiredSystemFeatures = [ "big-parallel" ];
 
   meta = {
     description = "Extremely fast Python type checker and language server, written in Rust";

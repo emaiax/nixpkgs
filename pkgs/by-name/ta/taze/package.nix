@@ -12,20 +12,20 @@
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "taze";
-  version = "19.14.1";
+  version = "21.1.0";
 
   src = fetchFromGitHub {
     owner = "antfu-collective";
     repo = "taze";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-tcyZ4nbMw+RjASQKOiMDUCYNSWBeJ0u/rQ9Dq81HA7Y=";
+    hash = "sha256-5fn6iUlcqgHxOqLMQKntmXGpoD3scgyOBUsR7yHffmg=";
   };
 
   pnpmDeps = fetchPnpmDeps {
     inherit (finalAttrs) pname version src;
     pnpm = pnpm_11;
     fetcherVersion = 4;
-    hash = "sha256-6J7yNwtekfMfsqeXWpNeqw4cak7z03494nYlBHRMZH0=";
+    hash = "sha256-PT6KN/9sMxh2BVgvutpQ2aFplD9CBskOL5I0uwU0oLk=";
   };
 
   nativeBuildInputs = [

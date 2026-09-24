@@ -2,13 +2,12 @@
   lib,
   stdenv,
   fetchFromGitHub,
-  fetchPypi,
-  fetchpatch,
+  fetchurl,
+  linkFarm,
   callPackage,
   nixosTests,
   gettext,
-  # tests fail and eventually lock up on 3.14
-  python313Packages,
+  python3Packages,
   ghostscript_headless,
   imagemagickBig,
   jbig2enc,
@@ -28,23 +27,11 @@ let
   defaultPythonPackageOverrides = final: prev: {
     django = prev.django_5;
 
-    fido2 = prev.fido2.overridePythonAttrs {
-      version = "1.2.0";
-
-      src = fetchPypi {
-        pname = "fido2";
-        version = "1.2.0";
-        hash = "sha256-45+VkgEi1kKD/aXlWB2VogbnBPpChGv6RmL4aqDTMzs=";
-      };
-
-      pytestFlags = [ ];
-    };
-
     # tesseract5 may be overwritten in the paperless module and we need to propagate that to make the closure reduction effective
-    ocrmypdf = prev.ocrmypdf_16.override { tesseract = tesseract5; };
+    ocrmypdf = prev.ocrmypdf.override { tesseract = tesseract5; };
   };
 
-  pythonPackages = python313Packages.overrideScope (
+  pythonPackages = python3Packages.overrideScope (
     final: prev:
     lib.composeManyExtensions [ defaultPythonPackageOverrides extraPythonPackageOverrides ] final prev
   );
@@ -61,41 +48,39 @@ let
   ];
 
   nltkDataDir = symlinkJoin {
-    name = "paperless_ngx_nltk_data";
+    name = "paperless-ngx-nltk-data";
     paths = with nltk-data; [
       punkt-tab
       snowball-data
       stopwords
     ];
   };
+
+  # The paperless_ai want tiktoken's cl100k_base tokenizer. If not provided, they would try to download them and fail.
+  # Seed tiktoken's on-disk cache instead so the tests can run and succeed offline; it keys cached files by sha1 of the download URL.
+  tiktokenCacheDir = linkFarm "paperless-ngx-tiktoken-cache" [
+    {
+      name = "9b5ad71b2ce5302211f9c61530b329a4922fc6a4";
+      path = fetchurl {
+        url = "https://web.archive.org/web/20260723164258/https://openaipublic.blob.core.windows.net/encodings/cl100k_base.tiktoken";
+        hash = "sha256-Ijkht27pm96ZW3/3OFE+7xAPtR0YyTWXoRO8/+hlsqc=";
+      };
+    }
+  ];
 in
 pythonPackages.buildPythonApplication (finalAttrs: {
   pname = "paperless-ngx";
+  version = "3.1.3";
   pyproject = true;
-
-  version = "2.20.15";
 
   src = fetchFromGitHub {
     owner = "paperless-ngx";
     repo = "paperless-ngx";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-Czh4Knel0IIHsTc3kEnp1153Kv+3721GRCbTYTkeCDg=";
+    hash = "sha256-iTNl+TGs9NbbPl1Z+Y7z5DaBIv//Fcq21A9zhkmqIuw=";
   };
 
-  patches = [
-    # fix tests with latest filelock
-    (fetchpatch {
-      url = "https://github.com/paperless-ngx/paperless-ngx/commit/5e1202a4168fbc8e36f816f36eb16dd7636e9d9c.diff";
-      includes = [ "src/*" ];
-      hash = "sha256-ZDC+T4DyOBBV8SCw8xyeYGua1XOhiP7eoZthnSE/Fkk=";
-    })
-  ];
-
   postPatch = ''
-    # pytest-xdist with to many threads makes the tests flaky
-    if (( $NIX_BUILD_CORES > 3)); then
-      NIX_BUILD_CORES=3
-    fi
     substituteInPlace pyproject.toml \
       --replace-fail '"--numprocesses=auto",' "" \
       --replace-fail '--maxprocesses=16' "--numprocesses=$NIX_BUILD_CORES"
@@ -109,16 +94,12 @@ pythonPackages.buildPythonApplication (finalAttrs: {
   ];
 
   pythonRelaxDeps = [
-    "celery"
     "django-allauth"
-    "django-auditlog"
-    "django-cachalot"
+    "django-filter"
     "drf-spectacular-sidecar"
-    "python-dotenv"
-    "gotenberg-client"
     "redis"
-    "scikit-learn"
-    "tika-client"
+    "regex"
+    "torch"
     # requested by maintainer
     "imap-tools"
     "ocrmypdf"
@@ -128,8 +109,10 @@ pythonPackages.buildPythonApplication (finalAttrs: {
   dependencies =
     with pythonPackages;
     [
+      azure-ai-documentintelligence
       babel
       bleach
+      celery
       channels
       channels-redis
       concurrent-log-handler
@@ -138,13 +121,13 @@ pythonPackages.buildPythonApplication (finalAttrs: {
       django-allauth
       django-auditlog
       django-cachalot
-      django-celery-results
       django-compression-middleware
       django-cors-headers
       django-extensions
       django-filter
       django-guardian
       django-multiselectfield
+      django-rich
       django-soft-delete
       django-treenode
       djangorestframework
@@ -157,13 +140,20 @@ pythonPackages.buildPythonApplication (finalAttrs: {
       gotenberg-client
       granian
       httpx-oauth
+      ijson
       imap-tools
-      inotifyrecursive
       jinja2
       langdetect
+      llama-index-core
+      llama-index-embeddings-huggingface
+      llama-index-embeddings-ollama
+      llama-index-embeddings-openai-like
+      llama-index-llms-ollama
+      llama-index-llms-openai-like
       mysqlclient
       nltk
       ocrmypdf
+      openai
       pathvalidate
       pdf2image
       psycopg
@@ -173,16 +163,18 @@ pythonPackages.buildPythonApplication (finalAttrs: {
       python-gnupg
       python-ipware
       python-magic
-      pyzbar
       rapidfuzz
       redis
+      regex
       scikit-learn
+      sentence-transformers
       setproctitle
+      sqlite-vec
+      tantivy
       tika-client
-      tqdm
-      watchdog
+      torch
+      watchfiles
       whitenoise
-      whoosh-reloaded
       zxing-cpp
     ]
     ++ django-allauth.optional-dependencies.mfa
@@ -190,6 +182,9 @@ pythonPackages.buildPythonApplication (finalAttrs: {
     ++ redis.optional-dependencies.hiredis;
 
   postBuild = ''
+    # v3 rejects the default secret key at import, which the manage.py calls below hit.
+    export PAPERLESS_SECRET_KEY=super-safe-secret-key
+
     # Compile manually because `pythonRecompileBytecodeHook` only works
     # for files in `python.sitePackages`
     ${pythonPackages.python.pythonOnBuildForHost.interpreter} -OO -m compileall src
@@ -230,6 +225,7 @@ pythonPackages.buildPythonApplication (finalAttrs: {
   nativeCheckInputs = with pythonPackages; [
     daphne
     factory-boy
+    faker
     imagehash
     pytest-cov-stub
     pytest-django
@@ -239,6 +235,7 @@ pythonPackages.buildPythonApplication (finalAttrs: {
     pytest-rerunfailures
     pytest-xdist
     pytestCheckHook
+    time-machine
   ];
 
   # manually managed in postPatch
@@ -264,25 +261,28 @@ pythonPackages.buildPythonApplication (finalAttrs: {
 
     # the generated pyc files conflict when running the tests
     rm -r build/lib
+  ''
+  # Use the seeded tiktoken cache so the paperless_ai tests tokenize offline, see above.
+  # Gated to avoid the download on runs with tests disabled.
+  + lib.optionalString finalAttrs.doInstallCheck ''
+    export TIKTOKEN_CACHE_DIR=${tiktokenCacheDir}
   '';
 
   disabledTests = [
     # FileNotFoundError(2, 'No such file or directory'): /build/tmp...
     "test_script_with_output"
     "test_script_exit_non_zero"
-    # Something broken with new Tesseract and inline RTL/LTR overrides?
-    "test_rtl_language_detection"
-    # Favicon tests fail due to static file handling in the test environment
-    # https://github.com/NixOS/nixpkgs/issues/421393
-    "test_favicon_view"
-    "test_favicon_view_missing_file"
-    # Requires DNS
+    # Requires internet
     "test_send_webhook_data_or_json"
-    # execnet.gateway_base.DumpError: can't serialize <class 'pathlib._local.PosixPath'>
-    # https://github.com/pytest-dev/pytest-xdist/issues/384
-    "test_subdirectory_upload"
-    # AssertionError: 4 != 3
-    "testNormalOperation"
+  ];
+
+  disabledTestPaths = [
+    # flaky test
+    #   AssertionError: Expected 'apply_async' to not have been called.
+    "src/documents/tests/test_management_consumer.py::TestCommandWatchEdgeCases::test_handles_deleted_before_stable"
+    # flaky test:
+    #   ValueError: Failed to open file for read: 'FileDoesNotExist("meta.json")'
+    "src/documents/tests/test_permission_filtering_security.py::TestTrashRestorePermissionBoundary::test_restore_allows_document_with_explicit_delete_permission"
   ];
 
   doCheck = !stdenv.hostPlatform.isDarwin;
@@ -296,6 +296,7 @@ pythonPackages.buildPythonApplication (finalAttrs: {
       nltkDataDir
       path
       tesseract5
+      tiktokenCacheDir
       ;
     inherit (pythonPackages) python;
     tests = { inherit (nixosTests) paperless; };

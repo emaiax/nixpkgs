@@ -5,27 +5,27 @@
   config,
   cudaPackages,
   cudaSupport ? config.cudaSupport,
-  stdenv,
+  stdenvNoCC,
   fetchzip,
   makeWrapper,
 }:
 
 let
-  pname = "Jan";
-  version = "0.8.3";
+  version = "0.8.4";
 
   darwin-src = fetchzip {
     url = "https://github.com/janhq/jan/releases/download/v${version}/jan-mac-universal-${version}.zip";
-    hash = "sha256-h2v71DzXez/+wlEp8IMVBk33LlXPhNPJ1UPNLYPShoE=";
+    hash = "sha256-hK9cu9c2kJRCJ3iy0CucRP0whgDgF5K29JgR4AIKXVg=";
   };
 
   linux-src = fetchurl {
     url = "https://github.com/janhq/jan/releases/download/v${version}/Jan_${version}_amd64.AppImage";
-    hash = "sha256-vEmioWQ4ic/FrtNFMKaLOcEy2BTRdouPc4PYWk90ZBI=";
+    hash = "sha256-NNTIq02kisIjINS2TCh0Rb2UyRMSlJLR2+uzZmWxSVo=";
   };
 
-  appimageContents = appimageTools.extractType2 {
-    inherit pname version;
+  appimageContents = appimageTools.extract {
+    pname = "Jan";
+    inherit version;
     src = linux-src;
   };
 
@@ -45,7 +45,8 @@ let
   };
 
   linux = appimageTools.wrapType2 {
-    inherit pname version;
+    pname = "Jan";
+    inherit version;
     src = linux-src;
 
     extraInstallCommands = ''
@@ -53,17 +54,17 @@ let
       cp -r ${appimageContents}/usr/share/icons $out/share
     '';
 
-    extraPkgs =
-      pkgs:
-      lib.optionals cudaSupport [
-        cudaPackages.cudatoolkit
-      ];
+    extraPkgs = pkgs: lib.optionals cudaSupport [ cudaPackages.cuda_cudart ];
 
     inherit passthru meta;
   };
 
-  darwin = stdenv.mkDerivation {
-    inherit pname version;
+  darwin = stdenvNoCC.mkDerivation {
+    pname = "Jan";
+    inherit version;
+
+    strictDeps = true;
+    __structuredAttrs = true;
 
     src = darwin-src;
 
@@ -76,11 +77,11 @@ let
     installPhase = ''
       runHook preInstall
 
-      mkdir -p $out/Applications/${pname}.app
+      mkdir -p $out/Applications/Jan.app
       mkdir -p $out/bin
-      cp -R $src/. $out/Applications/${pname}.app/
-      if [ -x "$out/Applications/${pname}.app/Contents/MacOS/${pname}" ]; then
-        makeWrapper "$out/Applications/${pname}.app/Contents/MacOS/${pname}" $out/bin/${pname}
+      cp -R $src/. $out/Applications/Jan.app/
+      if [ -x "$out/Applications/Jan.app/Contents/MacOS/Jan" ]; then
+        makeWrapper "$out/Applications/Jan.app/Contents/MacOS/Jan" $out/bin/Jan
       fi
 
       runHook postInstall
@@ -89,4 +90,4 @@ let
     inherit passthru meta;
   };
 in
-if stdenv.hostPlatform.isDarwin then darwin else linux
+if stdenvNoCC.hostPlatform.isDarwin then darwin else linux

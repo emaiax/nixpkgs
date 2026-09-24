@@ -29,16 +29,16 @@
 }:
 
 let
-  version = "0-unstable-2026-07-01";
-  rev = "95c1ab81f31f318a9e344d1d229feacff861ad39";
+  version = "0-unstable-2026-09-15";
+  rev = "fdf6cfe296e308c45aa5696a88a947feec2fe67a";
 
-  srcHash = "sha256-0GNoGD0S3YrHAaJ/aPNyVG6SfFi1h1NyTR1xmvd5+DQ=";
-  shaderHash = "sha256-4lKBrGh1rfhTBczmCDvIF2KxLyEHzHdKVGgQ+jLd/Dw=";
-  cargoHash = "sha256-1KZsh4M+ijd5LcoELzW9sGsuC+91XBamimvw0AXIgNU=";
-  npmHash = "sha256-Rb0bLPk54QigNp7TkDkJJy/TEJXAhlXOCruckwvdXks=";
+  srcHash = "sha256-k0C6ocP0lHwG402pmDHO0BLQ6DsK0Y4NqXLMJHHnBao=";
+  shaderHash = "sha256-LReut68Cwoz/YmXaLiVnccg+RerMrKqEWhiWGyx5k+Q=";
+  cargoHash = "sha256-/XEsrJed6rdsOpWFq6+trK9ylcH7v8g2XCExEI335jY=";
+  npmHash = "sha256-Cay+aZcZGAU2vKAs7nub/YVcQ/sxsruWhjZ9KkqXHuc=";
 
-  brandingRev = "0d004aa61e6b48d316e8e5db6d59ccc4788f192d";
-  brandingHash = "sha256-wAA6fR+NSxlCAqgwWmpiIAnji9k/jsMXpR0Vt04Ntmk=";
+  brandingRev = "6687dc6d3d8552948458d00d35e2bee3a40ab66b";
+  brandingHash = "sha256-yD4O50gz2mtby1h4o+9PqjMfYmTbBOX6XDc5Ez5fgnY=";
 
   src = fetchFromGitHub {
     owner = "GraphiteEditor";

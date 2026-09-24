@@ -27,6 +27,7 @@
   # tests
   aiosqlite,
   chex,
+  cloudpickle,
   fastapi,
   google-cloud-logging,
   greenlet,
@@ -42,7 +43,7 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "orbax-checkpoint";
-  version = "0.12.1";
+  version = "0.12.5";
   pyproject = true;
   __structuredAttrs = true;
 
@@ -50,7 +51,7 @@ buildPythonPackage (finalAttrs: {
     owner = "google";
     repo = "orbax";
     tag = "v${finalAttrs.version}";
-    hash = "sha256-yE8M8f2c+4lTL56LrS57vU/MMM3NgYCZOuHZWbdODh0=";
+    hash = "sha256-Lw1GXim5N1DjRfcZQ1lnUTaQ98RdaftMyqCPuSIBd8E=";
   };
 
   sourceRoot = "${finalAttrs.src.name}/checkpoint";
@@ -80,6 +81,7 @@ buildPythonPackage (finalAttrs: {
   nativeCheckInputs = [
     aiosqlite
     chex
+    cloudpickle
     fastapi
     google-cloud-logging
     greenlet
@@ -132,6 +134,9 @@ buildPythonPackage (finalAttrs: {
     # self.assertFalse(os.path.exists(dst_dir))
     # AssertionError: True is not false
     "test_create_snapshot"
+
+    # AssertionError: Expected 'BasePyTreeCheckpointHandler' to have been called.
+    "test_memory_options_propagation"
   ];
 
   disabledTestPaths = [

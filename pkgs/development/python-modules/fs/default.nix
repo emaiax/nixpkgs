@@ -10,9 +10,8 @@
   psutil,
   pyftpdlib,
   pytestCheckHook,
-  pythonAtLeast,
   pytz,
-  setuptools_80,
+  setuptools,
   six,
 }:
 
@@ -21,13 +20,15 @@ buildPythonPackage rec {
   version = "2.4.16";
   pyproject = true;
 
-  # https://github.com/PyFilesystem/pyfilesystem2/issues/596
-  disabled = pythonAtLeast "3.14";
-
   src = fetchPypi {
     inherit pname version;
     hash = "sha256-rpfH1RIT9LcLapWCklMCiQkN46fhWEHhCPvhRPBp0xM=";
   };
+
+  patches = [
+    ./drop-pkg-resources.patch
+    ./python-3.14-pathname2url.patch
+  ];
 
   postPatch = ''
     # https://github.com/PyFilesystem/pyfilesystem2/pull/591
@@ -35,10 +36,10 @@ buildPythonPackage rec {
       --replace ThreadedTestFTPd FtpdThreadWrapper
   '';
 
-  build-system = [ setuptools_80 ];
+  build-system = [ setuptools ];
 
   dependencies = [
-    setuptools_80
+    setuptools
     six
     appdirs
     pytz

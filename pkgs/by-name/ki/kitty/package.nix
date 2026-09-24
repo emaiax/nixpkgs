@@ -2,6 +2,7 @@
   lib,
   stdenv,
   fetchFromGitHub,
+  replaceVars,
   python3Packages,
   libunistring,
   harfbuzz,
@@ -45,28 +46,27 @@
   makeBinaryWrapper,
   darwin,
   cairo,
-  # TODO: Clean up on `staging`.
-  llvmPackages,
+  shader-slang,
 }:
 
 with python3Packages;
 buildPythonApplication rec {
   pname = "kitty";
-  version = "0.47.4";
+  version = "0.49.0";
   pyproject = false;
 
   src = fetchFromGitHub {
     owner = "kovidgoyal";
     repo = "kitty";
     tag = "v${version}";
-    hash = "sha256-UDuWbWg7HiyJ4q/fVLLD+ZFmK74H2A2HRRwPoyGyGtU=";
+    hash = "sha256-C1roiJ+mAm8rEoG5VAQABYUq2FSFVuusNQ0PtLP0tPI=";
   };
 
   goModules =
     (buildGo126Module {
       pname = "kitty-go-modules";
       inherit src version;
-      vendorHash = "sha256-o9S5KFT+9DRQ+OcZ5Wh8ZwtWE/19DYR810zCk+yUIr4=";
+      vendorHash = "sha256-G+eaFOFMIIu2Qo5Mgr3ejwoYrYmNv3EIdEEraDPIdeY=";
     }).goModules;
 
   buildInputs = [
@@ -109,18 +109,18 @@ buildPythonApplication rec {
     sphinx
     furo
     sphinx-copybutton
+    sphinx-design
     sphinxext-opengraph
     sphinx-inline-tabs
     go_1_26
     fontconfig
     makeBinaryWrapper
+    shader-slang
   ]
   ++ lib.optionals stdenv.hostPlatform.isDarwin [
     imagemagick
     libicns # For the png2icns tool.
     darwin.autoSignDarwinBinariesHook
-    # TODO: Clean up on `staging`.
-    llvmPackages.lld
   ]
   ++ lib.optionals stdenv.hostPlatform.isLinux [
     wayland-scanner
@@ -146,6 +146,9 @@ buildPythonApplication rec {
     # OSError: master_fd is in error condition
     ./disable-test_ssh_bootstrap_with_different_launchers.patch
 
+    (replaceVars ./libxkbcommon-runtime-path.patch {
+      libxkbcommon = "${lib.getLib libxkbcommon}/lib/libxkbcommon.so.0";
+    })
   ];
 
   hardeningDisable = [
@@ -157,10 +160,6 @@ buildPythonApplication rec {
     CGO_ENABLED = 0;
     GOFLAGS = "-trimpath";
     GOTOOLCHAIN = "local";
-  }
-  # TODO: Clean up on `staging`.
-  // lib.optionalAttrs stdenv.hostPlatform.isDarwin {
-    NIX_CFLAGS_LINK = "-fuse-ld=lld";
   };
 
   configurePhase = ''
@@ -252,6 +251,9 @@ buildPythonApplication rec {
     + ''
       # These depend on files that are not available in the sandbox
       rm tools/utils/machine_id/api_test.go
+
+      # These depend on cgroups and other resources that don't work as the tests expect in the sandbox
+      rm kitty_tests/child.py
     '';
 
   checkPhase = ''
@@ -295,6 +297,7 @@ buildPythonApplication rec {
       lib.makeBinPath [
         imagemagick
         ncurses.dev
+        shader-slang
       ]
     }"
 

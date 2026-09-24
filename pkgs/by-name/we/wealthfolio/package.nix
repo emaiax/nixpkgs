@@ -19,20 +19,20 @@
 }:
 stdenv.mkDerivation (finalAttrs: {
   pname = "wealthfolio";
-  version = "3.6.1";
+  version = "3.8.0";
 
   src = fetchFromGitHub {
-    owner = "afadil";
+    owner = "wealthfolio";
     repo = "wealthfolio";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-7RX5u4Qr5OSBCQvsf9F0LlIVd9VycpvoVvIKj08xA3A=";
+    hash = "sha256-5CqLHnwBzqA+yf/sQM2ie3xuO+5aM5EDA0bhZ6r1VIM=";
   };
 
   pnpmDeps = fetchPnpmDeps {
     inherit (finalAttrs) src pname version;
     pnpm = pnpm_10;
     fetcherVersion = 4;
-    hash = "sha256-dpxUdXqRbYPwq/wKu8XFdcjhDSGYo5ory9rIovHGJwk=";
+    hash = "sha256-I9s1hFNb7oHYH5OhKmtMbMsmQZXE6ovpupusN6M1YKc=";
   };
 
   cargoRoot = ".";
@@ -45,7 +45,7 @@ stdenv.mkDerivation (finalAttrs: {
       src
       cargoRoot
       ;
-    hash = "sha256-vNFYouLMP462N6G8cJppnKMBp9Wphh4mrMVO4WWaPJ4=";
+    hash = "sha256-PFMmpQhQubMzomvLWMJZrriH9emwEzO/rTFCovzFt6w=";
   };
 
   nativeBuildInputs = [
@@ -80,7 +80,7 @@ stdenv.mkDerivation (finalAttrs: {
     description = "Beautiful Private and Secure Desktop Investment Tracking Application";
     homepage = "https://wealthfolio.app/";
     license = lib.licenses.agpl3Only;
-    mainProgram = "wealthfolio";
+    mainProgram = "Wealthfolio";
     maintainers = with lib.maintainers; [ kilianar ];
     platforms = lib.platforms.linux;
   };

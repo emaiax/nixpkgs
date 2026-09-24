@@ -26,13 +26,13 @@
 
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "radicle-desktop";
-  version = "0.13.0";
+  version = "0.16.0";
 
   src = fetchFromRadicle {
     seed = "seed.radicle.dev";
     repo = "z4D5UCArafTzTQpDZNQRuqswh3ury";
     tag = "releases/${finalAttrs.version}";
-    hash = "sha256-XpzOzyUwAGLF/klXXbBFX5oLRSURB+AsL8n9WWv5x7s=";
+    hash = "sha256-Hv8E+Y0ktVthndyAnNXKyV9JZov8FoL5dMB+mwsYZJo=";
     leaveDotGit = true;
     postFetch = ''
       git -C $out rev-parse --short HEAD > $out/.git_head
@@ -53,10 +53,10 @@ rustPlatform.buildRustPackage (finalAttrs: {
 
   npmDeps = fetchNpmDeps {
     inherit (finalAttrs) src;
-    hash = "sha256-EigvRDUmiuz/wt5vZ3NSxovxjvxHVGrHdA9HIod/fO8=";
+    hash = "sha256-itRxXkyj28FxGbfqvA1D6buB/7xvbURNiu51YJK57C0=";
   };
 
-  cargoHash = "sha256-HInTwQYuLVFnRCbQq2hNRPGJP1I9gBRQZQ9ul3DWtBQ=";
+  cargoHash = "sha256-0DvCmdabjaHNixHfUBkwtSrOA9LwgHLKJAkfmS+v014=";
 
   twemojiAssets = fetchFromGitHub {
     owner = "twitter";

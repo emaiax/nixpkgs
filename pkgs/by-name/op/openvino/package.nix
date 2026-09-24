@@ -55,14 +55,14 @@ in
 
 stdenv.mkDerivation (finalAttrs: {
   pname = "openvino";
-  version = "2026.2.1";
+  version = "2026.3.1";
 
   src = fetchFromGitHub {
     owner = "openvinotoolkit";
     repo = "openvino";
     tag = finalAttrs.version;
     fetchSubmodules = true;
-    hash = "sha256-66g+v+L0BPNW6HvmWMHAHoNEFn9SUPrmZDyDjES6K1I=";
+    hash = "sha256-8oFTHNsxVfgssSFFKO61WoLNnonAcRoNJo8DW2Ec6s0=";
   };
 
   outputs = [
@@ -189,7 +189,7 @@ stdenv.mkDerivation (finalAttrs: {
       It supports pre-trained models from the Open Model Zoo, along with 100+ open source and public models in popular formats such as Caffe*, TensorFlow*, MXNet* and ONNX*.
     '';
     homepage = "https://docs.openvinotoolkit.org/";
-    license = with lib.licenses; [ asl20 ];
+    license = lib.licenses.asl20;
     platforms = lib.platforms.all;
     broken = stdenv.hostPlatform.isDarwin; # Cannot find macos sdk
   };

@@ -22,17 +22,17 @@
 
 rustPlatform.buildRustPackage (finalAttrs: {
   pname = "cosmic-player";
-  version = "1.2.0";
+  version = "1.8.0";
 
   # nixpkgs-update: no auto update
   src = fetchFromGitHub {
     owner = "pop-os";
     repo = "cosmic-player";
     tag = "epoch-${finalAttrs.version}";
-    hash = "sha256-4oIfTsEGMVmgS0VWLnQ1xAcPAzBeYaGT8xU3b/ObeO8=";
+    hash = "sha256-6AbCB1d4g9iy77HRXxEs0KT/7Ry6/quJs3Qumw5jTKI=";
   };
 
-  cargoHash = "sha256-aY5QYZ1OjiCHgfFysTTU6Wp/1IexAWjuZCkTFuFY1PI=";
+  cargoHash = "sha256-9ReitIbvr6D+BGLa1xumi67DPG3YlgdA4pZ/rfvn4Cc=";
 
   separateDebugInfo = true;
   __structuredAttrs = true;
@@ -72,6 +72,10 @@ rustPlatform.buildRustPackage (finalAttrs: {
 
   preFixup = ''
     libcosmicAppWrapperArgs+=(--prefix GST_PLUGIN_SYSTEM_PATH_1_0 : "$GST_PLUGIN_SYSTEM_PATH_1_0")
+
+    substituteInPlace $out/share/thumbnailers/com.system76.CosmicPlayer.thumbnailer \
+      --replace-fail "TryExec=cosmic-player" "TryExec=$out/bin/cosmic-player" \
+      --replace-fail "Exec=cosmic-player" "Exec=$out/bin/cosmic-player"
   '';
 
   passthru = {

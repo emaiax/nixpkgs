@@ -1,6 +1,7 @@
 # do not add pkgs, it messes up splicing
 {
   stdenv,
+  config,
   cargo,
   cmake,
 
@@ -44,7 +45,6 @@
   oniguruma,
   openldap,
   openssl,
-  pcre,
   pcre2,
   pkg-config,
   readline,
@@ -274,6 +274,10 @@ in
       final.bustedCheckHook
       writableTmpDirAsHomeHook
     ];
+
+    preCheck = ''
+      LUA_PATH="${vimPlugins.nvim-dap}/lua/?.lua;${vimPlugins.nvim-dap}/lua/?/init.lua;$LUA_PATH"
+    '';
   };
 
   ldbus = prev.ldbus.overrideAttrs (old: {
@@ -423,15 +427,6 @@ in
       {
         name = "ONIG";
         dep = oniguruma;
-      }
-    ];
-  };
-
-  lrexlib-pcre = prev.lrexlib-pcre.overrideAttrs {
-    externalDeps = [
-      {
-        name = "PCRE";
-        dep = pcre;
       }
     ];
   };
@@ -716,7 +711,6 @@ in
     ];
     propagatedBuildInputs = (old.propagatedBuildInputs or [ ]) ++ [
       final.bit32
-      final.std-normalize
     ];
   });
 
@@ -948,8 +942,12 @@ in
 
     # patchShebang removes the nvim in nlua's shebang so we hardcode one
     postFixup = ''
-      sed -i -e "1 s|.*|#\!${coreutils}/bin/env -S ${neovim-unwrapped}/bin/nvim -l|" "$out/bin/nlua"
+      substituteInPlace "$out/bin/nlua" \
+        --replace-fail \
+        "#!/usr/bin/env -S nvim" \
+        "#!${coreutils}/bin/env -S ${neovim-unwrapped}/bin/nvim"
     '';
+
     dontPatchShebangs = true;
   };
 
@@ -1343,4 +1341,7 @@ in
   });
 
   # keep-sorted end
+}
+// lib.optionalAttrs config.allowAliases {
+  lrexlib-pcre = throw "lrexlib-pcre was removed as the PCRE library is end-of-life"; # added 2026-08-03
 }

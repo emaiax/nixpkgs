@@ -4,6 +4,7 @@
   pythonAtLeast,
   pythonOlder,
   fetchFromGitHub,
+  fetchpatch2,
   isPyPy,
 
   # build-system
@@ -60,6 +61,14 @@ buildPythonPackage rec {
     hash = "sha256-PgqjCeyHOhWtZjyzSZyvsPT0Q7yRyNDiW3x1fQq0K+8=";
   };
 
+  patches = [
+    (fetchpatch2 {
+      name = "fix-test-stemmer.patch";
+      url = "https://github.com/sphinx-doc/sphinx/commit/c01b0eb640bbc3dbd8141f3ea08df9edaa78ab2c.patch?full_index=1";
+      hash = "sha256-Zi2WoYMSRg2xvbocj9XhEmXPAEebBokl9XyuSEpDaF0=";
+    })
+  ];
+
   build-system = [ flit-core ];
 
   dependencies = [
@@ -82,6 +91,8 @@ buildPythonPackage rec {
     # extra[docs]
     sphinxcontrib-websupport
   ];
+
+  pythonRelaxDeps = [ "docutils" ];
 
   __darwinAllowLocalNetworking = true;
 

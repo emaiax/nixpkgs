@@ -32,6 +32,7 @@
   libgcrypt,
   libgpg-error,
   libjpeg8,
+  libmanette,
   libopus,
   libpng,
   libsoup_3,
@@ -129,8 +130,8 @@ let
       inherit (download) url stripRoot;
       hash =
         {
-          x86_64-linux = "sha256-GASDnneoxfZLUctJLnaUTPW4HDbKdSamJBxFDVpPUC0=";
-          aarch64-linux = "sha256-qtqMCyEZVQu44HGI73t50D1WcnuzxuxLY7MDzf4NDeA=";
+          x86_64-linux = "sha256-My6nSOMD2NfPGUmOJKZgWpkjktEsj+P+CPeVmKy1VAQ=";
+          aarch64-linux = "sha256-5CCcWiZN1lVoiiSEO1OvxLcuKhSOIQrD5GH1TYr7XIY=";
         }
         .${system} or throwSystem;
     };
@@ -167,6 +168,7 @@ let
       libgcrypt
       libgpg-error
       libjpeg8
+      libmanette
       libopus
       libpng
       libsoup_3
@@ -204,8 +206,7 @@ let
     inherit (download) url stripRoot;
     hash =
       {
-        x86_64-darwin = "sha256-FFWFWKHroNBeDw4KYDe4UeucaJzMyin0Ca/qxN2iaO0=";
-        aarch64-darwin = "sha256-glVkYnthOFBPp1gZXTue9WwjP+oCgQpq6j9Mlm/bjmg=";
+        aarch64-darwin = "sha256-EjI0TdmQfB2qT2bBtbJFpsa+bplkJ5YyyVxNoOgsnZc=";
       }
       .${system} or throwSystem;
   };
@@ -213,7 +214,6 @@ in
 {
   x86_64-linux = webkit-linux;
   aarch64-linux = webkit-linux;
-  x86_64-darwin = webkit-darwin;
   aarch64-darwin = webkit-darwin;
 }
 .${system} or throwSystem

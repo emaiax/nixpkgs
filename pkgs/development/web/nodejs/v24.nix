@@ -9,10 +9,16 @@
 }:
 
 let
-  buildNodejs = callPackage ./nodejs.nix {
-    inherit openssl;
-    python = python3;
-  };
+  buildNodejs = callPackage ./nodejs.nix (
+    {
+      inherit openssl;
+      python = python3;
+    }
+    // lib.optionalAttrs stdenv.hostPlatform.isDarwin {
+      # libcxx21 makes FD tracking unreliable on Darwin. Pinning to libcxx20:
+      stdenv = buildPackages.llvmPackages_20.libcxxStdenv;
+    }
+  );
 
   gypPatches =
     if stdenv.buildPlatform.isDarwin then
@@ -23,22 +29,13 @@ let
       [ ];
 in
 buildNodejs {
-  version = "24.18.0";
-  sha256 = "e94afde24db08e0c564ee7110a2d5aab51ee0059382c9fd8233c54eec47b28f9";
+  version = "24.20.0";
+  sha256 = "2732fc3f588dd335cd6779c06864f7cd424bb1b5ff9a1743059a66c54f9ca4a1";
   patches =
-    (
-      if (stdenv.hostPlatform.emulatorAvailable buildPackages) then
-        [
-          ./configure-emulator.patch
-        ]
-      else
-        [
-          (fetchpatch2 {
-            url = "https://raw.githubusercontent.com/buildroot/buildroot/2f0c31bffdb59fb224387e35134a6d5e09a81d57/package/nodejs/nodejs-src/0003-include-obj-name-in-shared-intermediate.patch";
-            hash = "sha256-3g4aS+NmmUYNOYRNc6UMJKYoaTlpP5Knt9UHegx+o0Y=";
-          })
-        ]
-    )
+    (lib.optional (!(stdenv.hostPlatform.emulatorAvailable buildPackages)) (fetchpatch2 {
+      url = "https://raw.githubusercontent.com/buildroot/buildroot/2f0c31bffdb59fb224387e35134a6d5e09a81d57/package/nodejs/nodejs-src/0003-include-obj-name-in-shared-intermediate.patch";
+      hash = "sha256-3g4aS+NmmUYNOYRNc6UMJKYoaTlpP5Knt9UHegx+o0Y=";
+    }))
     ++ lib.optionals (stdenv.hostPlatform != stdenv.buildPlatform && stdenv.hostPlatform.isFreeBSD) [
       # This patch is concerning.
       # https://github.com/nodejs/node/issues/54576
@@ -56,6 +53,12 @@ buildNodejs {
       ./use-correct-env-in-tests.patch
       ./bin-sh-node-run-v22.patch
       ./use-nix-codesign.patch
+
+      # TODO: remove when support for OpenSSL 3.6.4 has landed upstream
+      (fetchpatch2 {
+        url = "https://github.com/nodejs/node/commit/a37601c99d7bde9abb3b3ae57b2fb2bacd81ec9d.patch?full_index=1";
+        hash = "sha256-AdAPMs1RZgqJ0bzNZ6IvChjT97lbW+XV4cRWygzU1qc=";
+      })
     ]
     ++ gypPatches
     ++ lib.optionals (!stdenv.buildPlatform.isDarwin) [

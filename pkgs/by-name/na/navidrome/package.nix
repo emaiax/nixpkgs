@@ -1,9 +1,8 @@
 {
-  buildGoModule,
+  buildGo127Module,
   buildPackages,
   fetchFromGitHub,
   fetchNpmDeps,
-  fetchpatch,
   lib,
   nodejs_24,
   npmHooks,
@@ -19,18 +18,18 @@
   plugins ? [ ],
 }:
 
-buildGoModule (finalAttrs: {
+buildGo127Module (finalAttrs: {
   pname = "navidrome";
-  version = "0.63.1";
+  version = "0.64.1";
 
   src = fetchFromGitHub {
     owner = "navidrome";
     repo = "navidrome";
     rev = "v${finalAttrs.version}";
-    hash = "sha256-sqPqcvi1XIjPuo02qxygM3a3/ih5w5vqfz6D8XRTxiA=";
+    hash = "sha256-zjg5JwpzcDe8LFvF/soE4IrsdpkNpO7psAoQrHlKCVI=";
   };
 
-  vendorHash = "sha256-lNjOVrlRD6ptDBpmfGYCN3Vkal9ACciOyS1RANzKYK4=";
+  vendorHash = "sha256-vndJx4BcXQCJewKCv3TvSrxG6sCykfBvkOQK/kVQIPk=";
 
   npmRoot = "ui";
 
