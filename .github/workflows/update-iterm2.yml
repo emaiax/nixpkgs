@@ -48,9 +48,11 @@ jobs:
             echo "base=master" >> "$GITHUB_OUTPUT"
           else
             echo "repo=emaiax/nixpkgs" >> "$GITHUB_OUTPUT"
-            # emaiax/nixpkgs's master isn't kept in sync with upstream, so diffing
-            # against it would show that entire divergence instead of just the
-            # version bump. update/iterm2-base is pinned to the pre-bump commit.
+            # master is synced with upstream by the step above, but GitHub's API can
+            # lag a few seconds behind that push; diffing against a not-yet-updated
+            # master would show the same runaway divergence that produced
+            # emaiax/nixpkgs#1. update/iterm2-base is pinned to the pre-bump commit
+            # instead, so the PR diff is correct regardless of sync propagation.
             echo "base=update/iterm2-base" >> "$GITHUB_OUTPUT"
           fi
 
@@ -191,6 +193,7 @@ jobs:
           [lib/tests]: https://github.com/NixOS/nixpkgs/blob/master/lib/tests
           [nixos/tests]: https://github.com/NixOS/nixpkgs/blob/master/nixos/tests
           [pkgs/README.md]: https://github.com/NixOS/nixpkgs/blob/master/pkgs/README.md
+          [pkgs/test]: https://github.com/NixOS/nixpkgs/blob/master/pkgs/test
           EOF
           gh pr create \
             --repo ${{ steps.target.outputs.repo }} \
