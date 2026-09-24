@@ -15,7 +15,7 @@ on:
         options:
           - upstream
           - origin
-        default: upstream
+        default: origin
 
 concurrency:
   group: update-iterm2
@@ -38,10 +38,10 @@ jobs:
       - name: Resolve the PR target repo
         id: target
         run: |
-          if [ "${{ github.event.inputs.target }}" = "origin" ]; then
-            echo "repo=emaiax/nixpkgs" >> "$GITHUB_OUTPUT"
-          else
+          if [ "${{ github.event.inputs.target }}" = "upstream" ]; then
             echo "repo=NixOS/nixpkgs" >> "$GITHUB_OUTPUT"
+          else
+            echo "repo=emaiax/nixpkgs" >> "$GITHUB_OUTPUT"
           fi
 
       - name: Sync local checkout with upstream nixpkgs
