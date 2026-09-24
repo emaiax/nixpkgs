@@ -45,6 +45,12 @@ jobs:
       - name: Install Nix
         uses: DeterminateSystems/nix-installer-action@main
 
+      - name: Read the current version
+        id: old_version
+        run: |
+          old_version=$(nix-instantiate --eval -E "with import ./. {}; iterm2.version" | tr -d '"')
+          echo "version=$old_version" >> "$GITHUB_OUTPUT"
+
       - name: Run iterm2's update.sh
         run: ./pkgs/by-name/it/iterm2/update.sh
 
@@ -104,7 +110,9 @@ jobs:
           git config user.email "emaiax@users.noreply.github.com"
           git checkout -B update/iterm2
           git add pkgs/by-name/it/iterm2/package.nix
-          git commit -m "iterm2: update to ${{ steps.version.outputs.version }}"
+          git commit -m "iterm2: ${{ steps.old_version.outputs.version }} -> ${{ steps.version.outputs.version }}
+
+          https://iterm2.com/downloads"
           git push --force "https://x-access-token:${GH_TOKEN}@github.com/emaiax/nixpkgs.git" update/iterm2
 
       - name: Close a stale PR and open a new one against NixOS/nixpkgs
