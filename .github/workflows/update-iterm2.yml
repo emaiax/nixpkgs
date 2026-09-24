@@ -200,7 +200,8 @@ jobs:
           title="iterm2: ${{ needs.prepare.outputs.old_version }} -> ${{ needs.prepare.outputs.new_version }}"
           existing=$(gh api "repos/${{ needs.prepare.outputs.repo }}/pulls?head=emaiax:update/iterm2&state=open" --jq '.[0].number')
           if [ -n "$existing" ]; then
-            gh pr edit "$existing" --repo ${{ needs.prepare.outputs.repo }} --title "$title" --body-file pr-body.md
+            gh api "repos/${{ needs.prepare.outputs.repo }}/pulls/$existing" \
+              --method PATCH -f title="$title" -F body=@pr-body.md
           else
             gh pr create \
               --repo ${{ needs.prepare.outputs.repo }} \
