@@ -113,3 +113,38 @@ jobs:
               echo "up_to_date=true" >> "$GITHUB_OUTPUT"
             fi
           fi
+
+      - name: Commit and push the update/iterm2 branch
+        if: steps.diff.outputs.changed == 'true' && steps.existing.outputs.up_to_date != 'true'
+        env:
+          GH_TOKEN: ${{ secrets.NIXPKGS_AUTO_UPDATE_TOKEN }}
+        run: |
+          git config user.name "emaiax"
+          git config user.email "emaiax@users.noreply.github.com"
+          git checkout -B update/iterm2
+          base_sha=$(git rev-parse HEAD)
+          git add pkgs/by-name/it/iterm2/package.nix
+          git commit -m "iterm2: ${{ steps.old_version.outputs.version }} -> ${{ steps.version.outputs.version }}
+
+          https://iterm2.com/downloads.html"
+          git push --force "https://x-access-token:${GH_TOKEN}@github.com/emaiax/nixpkgs.git" \
+            "${base_sha}:refs/heads/update/iterm2-base" update/iterm2
+
+  build:
+    runs-on: macos-latest
+    needs: prepare
+    if: needs.prepare.outputs.changed == 'true' && needs.prepare.outputs.up_to_date != 'true'
+    steps:
+      - name: Checkout the update/iterm2 branch
+        uses: actions/checkout@v4
+        with:
+          repository: emaiax/nixpkgs
+          ref: update/iterm2
+          fetch-depth: 1
+          persist-credentials: false
+
+      - name: Install Nix
+        uses: nixbuild/nix-quick-install-action@v30
+
+      - name: Build iterm2
+        run: nix-build -A iterm2 --no-out-link
