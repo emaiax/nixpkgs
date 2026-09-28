@@ -217,6 +217,12 @@ let
 
         capnp = callPackage ../development/ocaml-modules/capnp { };
 
+        capnp-rpc = callPackage ../development/ocaml-modules/capnp-rpc { };
+
+        capnp-rpc-net = callPackage ../development/ocaml-modules/capnp-rpc/net.nix { };
+
+        capnp-rpc-unix = callPackage ../development/ocaml-modules/capnp-rpc/unix.nix { };
+
         caqti = callPackage ../development/ocaml-modules/caqti { };
 
         caqti-async = callPackage ../development/ocaml-modules/caqti/async.nix { };
@@ -1834,9 +1840,13 @@ let
 
         ppx_deriving_yojson = callPackage ../development/ocaml-modules/ppx_deriving_yojson { };
 
+        ppx_expect_nobase = callPackage ../development/ocaml-modules/ppx_expect_nobase { };
+
         ppx_gen_rec = callPackage ../development/ocaml-modules/ppx_gen_rec { };
 
         ppx_import = callPackage ../development/ocaml-modules/ppx_import { };
+
+        ppx_inline_test_nobase = callPackage ../development/ocaml-modules/ppx_inline_test_nobase { };
 
         ppx_irmin = callPackage ../development/ocaml-modules/irmin/ppx.nix { };
 
