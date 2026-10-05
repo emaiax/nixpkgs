@@ -52,7 +52,6 @@
   sshfs,
   sops,
   stylish-haskell,
-  tabnine,
   tmux,
   typescript_7,
   typescript-language-server,
@@ -802,16 +801,6 @@ assertNoAdditions {
     checkInputs = [ self.nvim-cmp ];
   };
 
-  cmp-tabnine = super.cmp-tabnine.overrideAttrs {
-    checkInputs = [ self.nvim-cmp ];
-    buildInputs = [ tabnine ];
-
-    postFixup = ''
-      mkdir -p $target/binaries/${tabnine.version}
-      ln -s ${tabnine}/bin/ $target/binaries/${tabnine.version}/${tabnine.passthru.platform}
-    '';
-  };
-
   cmp-tmux = super.cmp-tmux.overrideAttrs {
     checkInputs = [ self.nvim-cmp ];
     dependencies = [ tmux ];
@@ -986,15 +975,6 @@ assertNoAdditions {
 
   completion-buffers = super.completion-buffers.overrideAttrs {
     dependencies = [ self.completion-nvim ];
-  };
-
-  completion-tabnine = super.completion-tabnine.overrideAttrs {
-    dependencies = [ self.completion-nvim ];
-    buildInputs = [ tabnine ];
-    postFixup = ''
-      mkdir -p $target/binaries
-      ln -s ${tabnine}/bin/TabNine $target/binaries/TabNine_$(uname -s)
-    '';
   };
 
   conflict-marker-vim = super.conflict-marker-vim.overrideAttrs (old: {
@@ -1186,6 +1166,15 @@ assertNoAdditions {
       license = lib.licenses.mit;
     };
   });
+
+  dadbod-grip-nvim = super.dadbod-grip-nvim.overrideAttrs {
+    # Optional pickers: these adapters probe for telescope/snacks with pcall and
+    # fall back to the built-in picker when the dependency is absent.
+    checkInputs = with self; [
+      snacks-nvim
+      telescope-nvim
+    ];
+  };
 
   dailies-nvim = super.dailies-nvim.overrideAttrs {
     runtimeDeps = [
@@ -1841,7 +1830,7 @@ assertNoAdditions {
     runtimeDeps = [ xxd ];
   };
 
-  himalaya-vim = super.himalaya-vim.overrideAttrs {
+  himalaya-vim9 = super.himalaya-vim9.overrideAttrs {
     buildInputs = [ himalaya ];
     # Optional integrations
     checkInputs = with self; [
@@ -3183,7 +3172,7 @@ assertNoAdditions {
     };
   });
 
-  notmuch-nvim = super.notmuch-nvim.overrideAttrs {
+  notmuch-nvim = super.notmuch-nvim.overrideAttrs (old: {
     checkInputs = [
       notmuch
     ];
@@ -3206,8 +3195,10 @@ assertNoAdditions {
           --replace-fail 'ffi.load("notmuch")' 'ffi.load("${notmuchLib}")'
       '';
 
-    meta.license = lib.licenses.mit;
-  };
+    meta = old.meta // {
+      license = lib.licenses.mit;
+    };
+  });
 
   NrrwRgn = super.NrrwRgn.overrideAttrs (old: {
     meta = old.meta // {
@@ -4143,10 +4134,6 @@ assertNoAdditions {
       license = lib.licenses.gpl3Only;
     };
   });
-
-  rust-tools-nvim = super.rust-tools-nvim.overrideAttrs {
-    dependencies = [ self.nvim-lspconfig ];
-  };
 
   rustaceanvim = super.rustaceanvim.overrideAttrs {
     checkInputs = [

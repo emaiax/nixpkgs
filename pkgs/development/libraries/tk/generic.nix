@@ -100,6 +100,7 @@ tcl.mkTclDerivation {
     homepage = "https://www.tcl-lang.org/";
     license = lib.licenses.tcltk;
     platforms = lib.platforms.all;
-    maintainers = [ ];
+    mainProgram = "wish";
+    maintainers = with lib.maintainers; [ fgaz ];
   };
 }
