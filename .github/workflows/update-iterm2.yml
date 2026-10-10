@@ -137,16 +137,12 @@ jobs:
           git push --force "https://x-access-token:${GH_TOKEN}@github.com/emaiax/nixpkgs.git" \
             "${base_sha}:refs/heads/update/iterm2-base" update/iterm2
 
-      - name: Close a stale PR and open a new one against the target repo
+      - name: Update the existing PR, or open a new one against the target repo
         if: steps.diff.outputs.changed == 'true' && steps.existing.outputs.up_to_date != 'true' && github.event.inputs.dry_run != 'true'
         env:
           GH_TOKEN: ${{ secrets.NIXPKGS_AUTO_UPDATE_TOKEN }}
         run: |
           existing=$(gh pr list --repo ${{ steps.target.outputs.repo }} --head update/iterm2 --state open --json number,headRepositoryOwner --jq '[.[] | select(.headRepositoryOwner.login == "emaiax")][0].number')
-          if [ -n "$existing" ]; then
-            gh pr close "$existing" --repo ${{ steps.target.outputs.repo }} \
-              --comment "superseded by iterm2 ${{ steps.version.outputs.version }}."
-          fi
           cat > pr-body.md <<EOF
           Changelog: https://iterm2.com/downloads.html
 
@@ -183,9 +179,16 @@ jobs:
 
           > automated bump via GitHub Actions running on a macos-latest (aarch64-darwin) runner: a workaround for nix-community/nixpkgs-update#513: the shared nixpkgs-update bot runs on Linux workers and can't evaluate/build darwin-only packages like \`iterm2\`.
           EOF
-          gh pr create \
-            --repo ${{ steps.target.outputs.repo }} \
-            --head emaiax:update/iterm2 \
-            --base ${{ steps.target.outputs.base }} \
-            --title "iterm2: ${{ steps.old_version.outputs.version }} -> ${{ steps.version.outputs.version }}" \
-            --body-file pr-body.md
+          title="iterm2: ${{ steps.old_version.outputs.version }} -> ${{ steps.version.outputs.version }}"
+          if [ -n "$existing" ]; then
+            # gh pr edit itself issues a read:org GraphQL query this token lacks; REST PATCH avoids it.
+            gh api --method PATCH "repos/${{ steps.target.outputs.repo }}/pulls/$existing" \
+              -f title="$title" -F body=@pr-body.md
+          else
+            gh pr create \
+              --repo ${{ steps.target.outputs.repo }} \
+              --head emaiax:update/iterm2 \
+              --base ${{ steps.target.outputs.base }} \
+              --title "$title" \
+              --body-file pr-body.md
+          fi
