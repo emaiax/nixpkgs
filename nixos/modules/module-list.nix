@@ -529,6 +529,7 @@
   ./services/continuous-integration/buildbot/worker.nix
   ./services/continuous-integration/buildkite-agents.nix
   ./services/continuous-integration/forgejo-runner.nix
+  ./services/continuous-integration/garm.nix
   ./services/continuous-integration/gitea-actions-runner.nix
   ./services/continuous-integration/github-runners.nix
   ./services/continuous-integration/gitlab-runner/runner.nix
@@ -976,7 +977,6 @@
   ./services/misc/pinnwand.nix
   ./services/misc/plex.nix
   ./services/misc/plikd.nix
-  ./services/misc/podgrab.nix
   ./services/misc/polaris.nix
   ./services/misc/portunus.nix
   ./services/misc/pufferpanel.nix
@@ -1780,6 +1780,7 @@
   ./services/web-apps/limesurvey.nix
   ./services/web-apps/linkding.nix
   ./services/web-apps/linkwarden.nix
+  ./services/web-apps/loops-server.nix
   ./services/web-apps/lubelogger.nix
   ./services/web-apps/mainsail.nix
   ./services/web-apps/mastodon.nix
