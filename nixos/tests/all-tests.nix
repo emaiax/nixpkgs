@@ -582,6 +582,7 @@ in
   druid = handleTestOn [ "x86_64-linux" ] ./druid { };
   drupal = runTest ./drupal.nix;
   dublin-traceroute = runTest ./dublin-traceroute.nix;
+  dufs = runTest ./dufs.nix;
   duplicity = runTest ./duplicity.nix;
   dwl = runTestOn [ "x86_64-linux" "aarch64-linux" ] ./dwl.nix;
   e57inspector = import ./e57inspector.nix { inherit pkgs runTest; };
@@ -983,6 +984,11 @@ in
   };
   kernel-generic = handleTest ./kernel-generic { };
   kernel-latest-ath-user-regd = runTest ./kernel-latest-ath-user-regd.nix;
+  kernel-module-verification = runTest ./kernel-module-verification.nix;
+  kernel-module-verification-latest = runTest {
+    imports = [ ./kernel-module-verification.nix ];
+    _module.args.latestKernel = true;
+  };
   kernel-rust = handleTest ./kernel-rust.nix { };
   keter = runTest ./keter.nix;
   kexec = runTest ./kexec.nix;
@@ -1686,6 +1692,7 @@ in
   rxe = runTest ./rxe.nix;
   sabnzbd = runTest ./sabnzbd.nix;
   sabnzbd-module = runTest ./sabnzbd-module.nix;
+  salt = runTest ./salt.nix;
   samba = runTest ./samba.nix;
   samba-wsdd = runTest ./samba-wsdd.nix;
   sane = runTest ./sane.nix;
@@ -2052,7 +2059,6 @@ in
   wakapi = runTest ./wakapi.nix;
   warpgate = runTest ./warpgate.nix;
   warzone2100 = runTest ./warzone2100.nix;
-  wasabibackend = runTest ./wasabibackend.nix;
   wastebin = runTest ./wastebin.nix;
   watchdogd = runTest ./watchdogd.nix;
   watt = runTest ./watt.nix;

@@ -1145,6 +1145,7 @@
   ./services/network-filesystems/davfs2.nix
   ./services/network-filesystems/diod.nix
   ./services/network-filesystems/drbd.nix
+  ./services/network-filesystems/dufs.nix
   ./services/network-filesystems/glusterfs.nix
   ./services/network-filesystems/ipfs-cluster.nix
   ./services/network-filesystems/kbfs.nix
@@ -1507,7 +1508,6 @@
   ./services/networking/veilid.nix
   ./services/networking/vsftpd.nix
   ./services/networking/vwifi.nix
-  ./services/networking/wasabibackend.nix
   ./services/networking/webhook.nix
   ./services/networking/websockify.nix
   ./services/networking/wg-access-server.nix
