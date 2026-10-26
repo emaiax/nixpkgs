@@ -27,7 +27,7 @@
 
 buildPythonPackage (finalAttrs: {
   pname = "langgraph-cli";
-  version = "0.4.33";
+  version = "0.4.37";
   pyproject = true;
   __structuredAttrs = true;
 
@@ -35,7 +35,7 @@ buildPythonPackage (finalAttrs: {
     owner = "langchain-ai";
     repo = "langgraph";
     tag = "cli==${finalAttrs.version}";
-    hash = "sha256-eYkUJSZ5191Qe+7bKIotSas0PVmzXwGEgw44i/HfI1g=";
+    hash = "sha256-Gmy8a40H6vrJpoo8xw+poff1kcy88PCjxIuh6rfcjfY=";
   };
 
   sourceRoot = "${finalAttrs.src.name}/libs/cli";

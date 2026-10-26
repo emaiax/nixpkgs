@@ -3204,12 +3204,6 @@
   "using-predefined-android-package-compositions": [
     "index.html#using-predefined-android-package-compositions"
   ],
-  "astal": [
-    "index.html#astal"
-  ],
-  "astal-bundling": [
-    "index.html#astal-bundling"
-  ],
   "spawning-emulator-instances": [
     "index.html#spawning-emulator-instances"
   ],
@@ -4368,6 +4362,9 @@
   ],
   "using-unittestcheckhook": [
     "index.html#using-unittestcheckhook"
+  ],
+  "using-stestrcheckhook": [
+    "index.html#using-stestrcheckhook"
   ],
   "using-sphinxhook": [
     "index.html#using-sphinxhook"
