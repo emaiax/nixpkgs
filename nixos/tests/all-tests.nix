@@ -774,6 +774,7 @@ in
   gocd-server = runTest ./gocd-server.nix;
   gocron = runTest ./gocron.nix;
   gocryptfs = runTest ./gocryptfs.nix;
+  goeland = runTest ./goeland.nix;
   gokapi = runTest ./gokapi.nix;
   gollum = runTest ./gollum.nix;
   gonic = runTest ./gonic.nix;
@@ -1487,6 +1488,7 @@ in
   plotinus = runTest ./plotinus.nix;
   pocket-id = runTest ./pocket-id.nix;
   podman = handleTestOn [ "aarch64-linux" "x86_64-linux" ] ./podman/default.nix { };
+  podman-dns = runTest ./podman/dns.nix;
   podman-tls-ghostunnel = handleTestOn [
     "aarch64-linux"
     "x86_64-linux"
@@ -1726,6 +1728,7 @@ in
   stash = handleTestOn [ "x86_64-linux" "aarch64-linux" ] ./stash.nix { };
   static-web-server = runTest ./web-servers/static-web-server.nix;
   step-ca = handleTestOn [ "x86_64-linux" ] ./step-ca.nix { };
+  steve = runTest ./steve;
   stirling-pdf = runTest ./stirling-pdf.nix;
   stirling-pdf-desktop = runTest ./stirling-pdf-desktop.nix;
   stratis = handleTest ./stratis { };
@@ -1896,6 +1899,7 @@ in
   tmate-ssh-server = runTest ./tmate-ssh-server.nix;
   tomcat = runTest ./tomcat.nix;
   tor = runTest ./tor.nix;
+  toxvpn = runTest ./toxvpn.nix;
   tpm-ek = handleTest ./tpm-ek { };
   tpm2 = import ./tpm2 { inherit runTest; };
   traccar = runTest ./traccar.nix;
@@ -2052,6 +2056,7 @@ in
     inherit lib runTest;
   };
   yggdrasil = runTest ./yggdrasil.nix;
+  yopass = import ./web-apps/yopass.nix { inherit pkgs runTest; };
   your_spotify = runTest ./your_spotify.nix;
   zammad = runTest ./zammad.nix;
   zapret2 = runTest ./zapret2.nix;
