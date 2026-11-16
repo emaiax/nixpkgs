@@ -191,14 +191,14 @@ lib.makeExtensible (
 
       nixComponents_2_35 =
         (nixDependencies.callPackage ./modular/packages.nix rec {
-          version = "2.35.5";
+          version = "2.35.6";
           inherit teams;
           otherSplices = generateSplicesForNixComponents "nixComponents_2_35";
           src = removeFunctionalTests commonDisabledTests (fetchFromGitHub {
             owner = "NixOS";
             repo = "nix";
             tag = version;
-            hash = "sha256-SDSmfEcnZjAf9pz1TPRyzETrWuWTetzwRXSdZLTGVLg=";
+            hash = "sha256-9Rv764+TAhZ0mNbjkReNOBHraHHNuMgqILvPi4HHS2c=";
           });
         }).appendPatches
           [ ];
@@ -210,12 +210,12 @@ lib.makeExtensible (
           src = fetchFromGitHub {
             owner = "NixOS";
             repo = "nix";
-            rev = "f3f184834895f45030d69f20a311b2eac99ebf1d";
-            hash = "sha256-TyuLrhxjzHjIYWtpBgSHi8wdKw7ciLiyfrdfJe33uEc=";
+            rev = "eb1c34815a4699baba92ffdc7cfbfd82196ca56e";
+            hash = "sha256-nWOxmBRHfjNO71DTno+Jky5V5pMBQT9TIgyjcp1rBaw=";
           };
         in
         (nixDependencies.callPackage ./modular/packages.nix {
-          version = "2.36pre20261020_${lib.substring 0 8 src.rev}";
+          version = "2.36pre20261112_${lib.substring 0 8 src.rev}";
           inherit teams;
           otherSplices = generateSplicesForNixComponents "nixComponents_git";
           src = removeFunctionalTests commonDisabledTests src;
@@ -227,7 +227,7 @@ lib.makeExtensible (
       latest = self.nix_2_35;
 
       # Read ./README.md before bumping a major release
-      stable = addFallbackPathsCheck self.nix_2_34;
+      stable = addFallbackPathsCheck self.nix_2_35;
     }
     // lib.optionalAttrs config.allowAliases (
       lib.listToAttrs (

@@ -313,6 +313,7 @@ in
   authelia = runTest ./authelia.nix;
   auto-cpufreq = runTest ./auto-cpufreq.nix;
   autobrr = runTest ./autobrr.nix;
+  autofs = runTest ./autofs.nix;
   autopush-rs = runTest ./autopush-rs.nix;
   autosuspend = runTest ./autosuspend.nix;
   avahi = runTest {
@@ -361,7 +362,6 @@ in
   bitbox-bridge = runTest ./bitbox-bridge.nix;
   bitcoind = runTest ./bitcoind.nix;
   bittorrent = runTest ./bittorrent.nix;
-  blint = runTest ./blint.nix;
   blockbook-frontend = runTest ./blockbook-frontend.nix;
   blocky = runTest ./blocky.nix;
   bluesky-pds = runTest ./bluesky-pds.nix;
@@ -370,6 +370,7 @@ in
   boot = handleTestOn [ "x86_64-linux" "aarch64-linux" ] ./boot.nix { };
   boot-stage2 = runTest ./boot-stage2.nix;
   bootspec = handleTestOn [ "x86_64-linux" ] ./bootspec.nix { };
+  bootvine = runTest ./bootvine.nix;
   borgbackup = runTest ./borgbackup.nix;
   borgmatic = runTest ./borgmatic.nix;
   bpf = runTestOn [ "x86_64-linux" "aarch64-linux" ] ./bpf.nix;
@@ -415,6 +416,7 @@ in
   certmgr = import ./certmgr.nix { inherit pkgs runTest; };
   cfssl = runTestOn [ "aarch64-linux" "x86_64-linux" ] ./cfssl.nix;
   cgit = runTest ./cgit.nix;
+  changedetection-io = runTest ./changedetection-io.nix;
   charliecloud = runTest ./charliecloud.nix;
   chhoto-url = runTest ./chhoto-url.nix;
   chipass = runTest ./chipass.nix;
@@ -528,6 +530,7 @@ in
   };
   cri-o = runTestOn [ "aarch64-linux" "x86_64-linux" ] ./cri-o.nix;
   croc = runTest ./croc.nix;
+  cron = runTest ./cron.nix;
   cross-seed = runTest ./cross-seed.nix;
   crowdsec = import ./crowdsec/default.nix { inherit runTest; };
   cryptpad = runTest ./cryptpad.nix;
@@ -560,6 +563,7 @@ in
     imports = [ ./discourse.nix ];
     _module.args.package = pkgs.discourseAllPlugins;
   };
+  distccd = runTest ./distccd.nix;
   dnscrypt-proxy = runTestOn [ "x86_64-linux" ] ./dnscrypt-proxy.nix;
   dnsdist = import ./dnsdist.nix { inherit pkgs runTest; };
   doas = runTest ./doas.nix;
@@ -642,6 +646,7 @@ in
   fanout = runTest ./fanout.nix;
   fastnetmon-advanced = runTest ./fastnetmon-advanced.nix;
   fcitx5 = runTest ./fcitx5;
+  fcron = runTest ./fcron.nix;
   fedimintd = runTest ./fedimintd.nix;
   feishin = handleTest ./feishin { };
   ferm = runTest ./ferm.nix;
@@ -778,6 +783,7 @@ in
   gokapi = runTest ./gokapi.nix;
   gollum = runTest ./gollum.nix;
   gonic = runTest ./gonic.nix;
+  google-chrome = runTestOn [ "aarch64-linux" "x86_64-linux" ] ./google-chrome.nix;
   google-oslogin = runTest ./google-oslogin;
   gophernicus = runTest ./gophernicus.nix;
   gopro-tool = runTest ./gopro-tool.nix;
@@ -830,7 +836,6 @@ in
   haproxy = runTest ./haproxy.nix;
   harmonia = runTest ./harmonia.nix;
   harmonia-gc = runTest ./harmonia-gc.nix;
-  haste-server = runTest ./haste-server.nix;
   hbase2 = runTest {
     imports = [ ./hbase.nix ];
     _module.args.getPackage = pkgs: pkgs.hbase2;
@@ -922,6 +927,7 @@ in
   isso = runTest ./isso.nix;
   jackett = runTest ./jackett.nix;
   jellyfin = runTest ./jellyfin.nix;
+  jellystat = runTest ./jellystat.nix;
   jenkins = runTest ./jenkins.nix;
   jenkins-cli = runTest ./jenkins-cli.nix;
   jibri = runTest ./jibri.nix;
@@ -1026,7 +1032,7 @@ in
   libinput = runTest ./libinput.nix;
   librechat = runTest ./librechat.nix;
   librenms = runTest ./librenms.nix;
-  libreqos = runTest ./libreqos.nix;
+  libreqos = runTestOn [ "x86_64-linux" ] ./libreqos.nix;
   libresprite = runTest ./libresprite.nix;
   libreswan = runTest ./libreswan.nix;
   libreswan-nat = runTest ./libreswan-nat.nix;
@@ -1410,7 +1416,6 @@ in
   osrm-backend = runTest ./osrm-backend.nix;
   outline = runTest ./outline.nix;
   overlayfs = runTest ./overlayfs.nix;
-  owi = runTest ./owi.nix;
   owncast = runTest ./owncast.nix;
   oxidized = handleTest ./oxidized.nix { };
   oxwm = runTestOn [ "x86_64-linux" "aarch64-linux" ] ./oxwm.nix;
@@ -1446,6 +1451,7 @@ in
   peerflix = runTest ./peerflix.nix;
   peering-manager = runTest ./web-apps/peering-manager.nix;
   peertube = handleTestOn [ "x86_64-linux" ] ./web-apps/peertube.nix { };
+  pelican-panel = runTest ./pelican-panel.nix;
   perses = runTest ./perses.nix;
   pgadmin4 = runTest ./pgadmin4.nix;
   pgbackrest = import ./pgbackrest { inherit runTest; };
@@ -1479,6 +1485,7 @@ in
     inherit runTest;
     php = pkgs.php86;
   };
+  phrog = runTest ./phrog.nix;
   phylactery = runTest ./web-apps/phylactery.nix;
   pict-rs = runTest ./pict-rs.nix;
   pihole-ftl = import ./pihole-ftl { inherit runTest; };
@@ -1614,6 +1621,7 @@ in
   restic = runTest ./restic.nix;
   restic-rest-server = runTest ./restic-rest-server.nix;
   retroarch = runTest ./retroarch.nix;
+  retroarch-wrapper = runTest ./retroarch-wrapper.nix;
   ringboard = runTest ./ringboard.nix;
   rke2 = import ./rancher {
     inherit lib pkgs;
@@ -1634,6 +1642,7 @@ in
   routinator = handleTest ./routinator.nix { };
   rqbit = runTest ./rqbit.nix;
   rshim = handleTest ./rshim.nix { };
+  rsnapshot = runTest ./rsnapshot.nix;
   rspamd = handleTest ./rspamd.nix { };
   rspamd-trainer = runTest ./rspamd-trainer.nix;
   rss-bridge = handleTest ./web-apps/rss-bridge { };
@@ -1667,7 +1676,7 @@ in
   scx-loader = runTest ./scx-loader.nix;
   sddm = import ./sddm.nix { inherit runTest; };
   sdl3 = runTest ./sdl3.nix;
-  searx = runTest ./searx.nix;
+  searx = import ./searx.nix { inherit pkgs runTest; };
   seatd = runTest ./seatd.nix;
   seerr = runTest ./seerr.nix;
   selfoss = runTest ./selfoss.nix;
@@ -1680,7 +1689,6 @@ in
   shadow = import ./shadow { inherit runTest; };
   shadowsocks = handleTest ./shadowsocks { };
   shadps4 = runTest ./shadps4.nix;
-  sharkey = runTest ./web-apps/sharkey.nix;
   shattered-pixel-dungeon = runTest ./shattered-pixel-dungeon.nix;
   shelfmark = runTest ./shelfmark.nix;
   shiori = runTest ./shiori.nix;
@@ -2013,7 +2021,6 @@ in
   watt = runTest ./watt.nix;
   webhook = runTest ./webhook.nix;
   weblate = runTest ./web-apps/weblate.nix;
-  wg-access-server = runTest ./wg-access-server.nix;
   whisparr_2 = runTest {
     imports = [ ./whisparr.nix ];
     _module.args.getPackage = pkgs: pkgs.whisparr_2;
